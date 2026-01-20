@@ -15,7 +15,7 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
-    const { username, email, password, role } = value;
+    const { username, email, password } = value;
 
     const user = await UserModel.findOne({ $or: [{ email }, { username }] });
     if (user) {
@@ -29,7 +29,7 @@ export const registerUser = async (req, res, next) => {
       username,
       email,
       password: hashedPassword,
-      role,
+      role: "user",
     });
 
     await generateTokenAndCookie(
@@ -57,7 +57,7 @@ export const loginUser = async (req, res, next) => {
 
     const user = await UserModel.findOne({ email }).select("+password");
     if (!user) {
-      res.status(404);
+      res.status(401);
       throw new Error("User doesn't exits");
     }
 
