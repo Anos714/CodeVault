@@ -35,6 +35,11 @@ export const generateTokenAndCookie = async (statusCode, res, msg, user) => {
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
   };
 
+  res.cookie("accessToken", accessToken, {
+    ...cookieOptions,
+    maxAge: 15 * 60 * 1000,
+  });
+
   res.cookie("refreshToken", refreshToken, {
     ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -43,7 +48,6 @@ export const generateTokenAndCookie = async (statusCode, res, msg, user) => {
   return res.status(statusCode).json({
     success: true,
     msg,
-    accessToken,
     user: {
       _id: user._id,
       username: user.username,
