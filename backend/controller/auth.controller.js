@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { UserModel } from "../models/User.model.js";
 import { registerSchema, loginSchema } from "../validations/user.validation.js";
@@ -67,7 +68,7 @@ export const loginUser = async (req, res, next) => {
       throw new Error("Invalid credentials");
     }
 
-    await generateTokenAndCookie(200, res, "User login successfully", user);
+    await generateTokenAndCookie(200, res, "User logged in successfully", user);
   } catch (error) {
     next(error);
   }
@@ -75,7 +76,76 @@ export const loginUser = async (req, res, next) => {
 
 export const logoutUser = async (req, res, next) => {
   try {
-    
+    await UserModel.findByIdAndUpdate(
+      req.user._id,
+      { refreshToken: null },
+      { new: true },
+    );
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    };
+
+    res
+      .status(200)
+      .clearCookie("accessToken", cookieOptions)
+      .clearCookie("refreshToken", cookieOptions)
+      .json({ success: true, msg: "User logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshAccessToken = async (req, res, next) => {
+  try {
+    const incomingRefreshToken = req.cookies.refreshToken;
+    if (!incomingRefreshToken) {
+      res.status(401);
+      throw new Error("Unauthorized request, No refresh token");
+    }
+
+    const decoded = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_JWT_SECRET,
+    );
+
+    const user = await UserModel.findById(decoded._id).select("+refreshToken");
+    if (!user) {
+      res.status(401);
+      throw new Error("Invalid refresh token");
+    }
+    if (incomingRefreshToken !== user?.refreshToken) {
+      res.status(401);
+      throw new Error("Refresh token is expired or used");
+    }
+
+    const accessToken = jwt.sign(
+      {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.ACCESS_TOKEN_JWT_SECRET,
+      {
+        expiresIn: "15m",
+      },
+    );
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+    };
+
+    res.cookie("accessToken", accessToken, cookieOptions);
+    return res.status(200).json({
+      success: true,
+      message: "Access token refreshed",
+    });
   } catch (error) {
     next(error);
   }
