@@ -146,7 +146,7 @@ export const addSnippet = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      msg: "snippet added successfully",
+      msg: "Code snippet added successfully",
       snippet,
     });
   } catch (error) {
@@ -163,6 +163,27 @@ export const updateSnippet = async (req, res, next) => {
 
 export const deleteSnippet = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const snippet = await SnippetModel.findById(id);
+    if (!snippet) {
+      res.status(404);
+      throw new Error("Code snippet not found");
+    }
+
+    if (
+      req.user._id.toString() !== snippet.owner.toString() &&
+      req.user.role !== "admin"
+    ) {
+      res.status(403);
+      throw new Error("You do not have access to do this operation");
+    }
+
+    const deletedSnippet = await SnippetModel.findByIdAndDelete(id);
+    return res.status(200).json({
+      success: true,
+      msg: "code snippet deleted successfully",
+      deletedSnippet,
+    });
   } catch (error) {
     next(error);
   }
