@@ -91,9 +91,9 @@ This project is built using the **MERN stack**:
 ## 🗺️ Development Roadmap
 
 - [x] Project planning & architecture
-- [ ] Backend API setup
-- [ ] User authentication
-- [ ] Snippet CRUD operations
+- [x] Backend API setup
+- [x] User authentication
+- [x] Snippet CRUD operations
 - [ ] Monaco Editor integration
 - [ ] Tagging & search system
 - [ ] UI/UX improvements
