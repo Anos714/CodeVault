@@ -1,5 +1,8 @@
 import { SnippetModel } from "../models/Snippet.model.js";
-import { snippetSchema } from "../validations/snippet.validation.js";
+import {
+  patchedSnippetSchema,
+  snippetSchema,
+} from "../validations/snippet.validation.js";
 
 export const getAllSnippets = async (req, res, next) => {
   try {
@@ -156,6 +159,39 @@ export const addSnippet = async (req, res, next) => {
 
 export const updateSnippet = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const { error, value } = patchedSnippetSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        msg: error.details[0].message,
+      });
+    }
+
+    const snippet = await SnippetModel.findById(id);
+    if (!snippet) {
+      res.status(404);
+      throw new Error("Code snippet not found");
+    }
+
+    if (req.user._id.toString() !== snippet.owner.toString()) {
+      res.status(403);
+      throw new Error("You do not have access to do this operation");
+    }
+
+    if (value.tags) {
+      value.tags = [...new Set(value.tags)];
+    }
+
+    const updatedSnippet = await SnippetModel.findByIdAndUpdate(id, value, {
+      new: true,
+    });
+
+    return res.status(200).json({
+      success: true,
+      msg: "code snippet updated successfully",
+      updatedSnippet,
+    });
   } catch (error) {
     next(error);
   }
