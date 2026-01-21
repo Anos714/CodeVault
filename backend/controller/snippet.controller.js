@@ -1,5 +1,4 @@
 import { SnippetModel } from "../models/Snippet.model.js";
-import { UserModel } from "../models/User.model.js";
 import { snippetSchema } from "../validations/snippet.validation.js";
 
 export const getAllSnippets = async (req, res, next) => {
@@ -48,6 +47,31 @@ export const getAllSnippets = async (req, res, next) => {
 
 export const getSingleSnippetDetail = async (req, res, next) => {
   try {
+    const { id } = req.params;
+    const snippetDetails = await SnippetModel.findById(id).populate({
+      path: "owner",
+      select: "username",
+    });
+    if (!snippetDetails) {
+      res.status(404);
+      throw new Error("Code snippet not found");
+    }
+
+    if (snippetDetails.visibility === "private") {
+      const isOwner =
+        req.user &&
+        req.user._id.toString() === snippetDetails.owner._id.toString();
+
+      if (!isOwner) {
+        res.status(403);
+        throw new Error("This snippet is private. You don't have access.");
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: snippetDetails,
+    });
   } catch (error) {
     next(error);
   }

@@ -8,10 +8,11 @@ import {
   getUserSnippets,
   updateSnippet,
 } from "../controller/snippet.controller.js";
+import { optionalAuth } from "../middlewares/optionalAuth.middleware.js";
 const router = Router();
 
 router.get("/all", getAllSnippets);
-router.get("/:id", getSingleSnippetDetail);
+router.get("/:id", optionalAuth, getSingleSnippetDetail);
 router.get("/user/me", isAuth, getUserSnippets);
 router.post("/add", isAuth, addSnippet);
 router.patch("/update/:id", isAuth, updateSnippet);
