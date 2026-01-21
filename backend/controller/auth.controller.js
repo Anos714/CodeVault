@@ -150,3 +150,14 @@ export const refreshAccessToken = async (req, res, next) => {
     next(error);
   }
 };
+
+export const checkUserStatus = async (req, res, next) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      user: req.user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
