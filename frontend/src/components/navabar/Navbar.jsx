@@ -19,7 +19,7 @@ const Navbar = () => {
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              {["Features", "Tech Stack", "Roadmap"].map((item) => (
+              {["Features", "Solutions", "Tech Stack"].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase().replace(" ", "-")}`}

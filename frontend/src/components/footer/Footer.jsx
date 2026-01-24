@@ -3,28 +3,28 @@ import { Github, Linkedin, Twitter } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-950 pb-10 border-t border-slate-800">
-      <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-slate-900 text-slate-500 text-sm">
+    <footer className="bg-slate-900 h-[100px] border-t-3 border-slate-700 ">
+      <div className="flex flex-col justify-center items-center h-full  w-full md:gap-5">
         <p>&copy; 2024 CodeVault. All rights reserved.</p>
         <div className="flex gap-6 mt-4 md:mt-0">
           <a
             href="https://linkedin.com/in/rahulxcode"
             target="_blank"
-            className="hover:text-white transition-colors"
+            className="hover:text-blue-400 transition-colors"
           >
             <Linkedin />
           </a>
           <a
             href="https://x.com/RahulSain714"
             target="_blank"
-            className="hover:text-white transition-colors"
+            className="hover:text-blue-400 transition-colors"
           >
             <Twitter />
           </a>
           <a
             href="https://github.com/Anos714"
             target="_blank"
-            className="hover:text-white transition-colors"
+            className="hover:text-blue-400 transition-colors"
           >
             <Github />
           </a>
