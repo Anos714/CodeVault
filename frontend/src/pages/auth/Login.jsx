@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../utils/Auth";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -102,7 +101,7 @@ const Login = () => {
                 )}
                 <div className="absolute right-3 top-3">
                   <button onClick={() => setShowPassword((prev) => !prev)}>
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <EyeOff /> : <Eye />}
                   </button>
                 </div>
               </div>
