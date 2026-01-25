@@ -3,9 +3,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../utils/Auth";
 import { Eye, EyeOff } from "lucide-react";
+import { loginUser } from "../../store/thunks/auth.thunks";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -16,9 +23,19 @@ const Login = () => {
   });
 
   const handleLoginSubmit = async (data) => {
-    console.log("Form Submitted:", data);
-  };
+    const toastId = toast.loading("Registering user...");
+    try {
+      const response = await dispatch(loginUser(data)).unwrap();
+      console.log(response);
 
+      toast.success(response.msg || "Login Successful!", {
+        id: toastId,
+      });
+      navigate("/snippets");
+    } catch (error) {
+      toast.error(error || "Login failed", { id: toastId });
+    }
+  };
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gray-950 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-[#090d22] p-8 shadow-lg ring-1 ring-white/10 sm:p-10">

@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../utils/Auth";
 import { Eye, EyeOff } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { registerUser } from "../../store/thunks/auth.thunks";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -18,7 +24,18 @@ const Register = () => {
   });
 
   const handleRegisterSubmit = async (data) => {
-    console.log("Registration Data:", data);
+    const toastId = toast.loading("Registering user...");
+    try {
+      const response = await dispatch(registerUser(data)).unwrap();
+      console.log(response);
+
+      toast.success(response.msg || "Registration Successful!", {
+        id: toastId,
+      });
+      navigate("/snippets");
+    } catch (error) {
+      toast.error(error || "Registration failed", { id: toastId });
+    }
   };
 
   const inputStyles =

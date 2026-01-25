@@ -15,7 +15,14 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
-    const { username, email, password } = value;
+    const { username, email, password, confirmPassword } = value;
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        msg: "Passwords do not match",
+      });
+    }
 
     const user = await UserModel.findOne({ $or: [{ email }, { username }] });
     if (user) {
