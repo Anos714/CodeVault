@@ -27,14 +27,13 @@ const Register = () => {
     const toastId = toast.loading("Registering user...");
     try {
       const response = await dispatch(registerUser(data)).unwrap();
-      console.log(response);
 
       toast.success(response.msg || "Registration Successful!", {
         id: toastId,
       });
       navigate("/snippets");
     } catch (error) {
-      toast.error(error || "Registration failed", { id: toastId });
+      toast.error(error.message || "Registration failed", { id: toastId });
     }
   };
 

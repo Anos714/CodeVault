@@ -3,15 +3,15 @@ import { Lock, X, Menu, LogOut, LayoutDashboard, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { logoutUser } from "../../store/thunks/auth.thunks";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
   const userData = useSelector((state) => state.auth.user);
-  const { user } = userData;
 
   const dropdownRef = useRef(null);
 
@@ -29,10 +29,20 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleLogout = () => {
-    navigate("/login");
-    setIsProfileOpen(false);
-    setIsMenuOpen(false);
+  const handleLogout = async () => {
+    const toastId = toast.loading("Logging out...");
+    try {
+      const response = await dispatch(logoutUser()).unwrap();
+
+      toast.success(response.msg || "Logout Successful!", {
+        id: toastId,
+      });
+      navigate("/login");
+      setIsMenuOpen(false);
+      setIsProfileOpen(false);
+    } catch (error) {
+      toast.error(error.message || "Logout failed", { id: toastId });
+    }
   };
 
   return (
@@ -63,15 +73,15 @@ const Navbar = () => {
                 </a>
               ))}
 
-              {user ? (
+              {userData?.user ? (
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center gap-2 focus:outline-none"
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-cyan-500/20 border border-white/10">
-                      {user?.username
-                        ? user.username.charAt(0).toUpperCase()
+                      {userData?.user?.username
+                        ? userData?.user.username.charAt(0).toUpperCase()
                         : "O"}
                     </div>
                   </button>
@@ -87,10 +97,10 @@ const Navbar = () => {
                       >
                         <div className="px-4 py-2 border-b border-slate-800 mb-2">
                           <p className="text-sm text-white font-medium truncate">
-                            {user.username}
+                            {userData?.user.username}
                           </p>
                           <p className="text-xs text-slate-400 truncate">
-                            {user.email}
+                            {userData?.user.email}
                           </p>
                         </div>
 
@@ -118,7 +128,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => navigate("/login")}
-                    className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                    className="text-slate-300 hover:text-white text-sm font-medium transition-colors bg-slate-700 p-2 rounded-lg border border-slate-600 hover:bg-slate-600"
                   >
                     Sign In
                   </button>
@@ -169,19 +179,21 @@ const Navbar = () => {
               ))}
 
               <div className="border-t border-slate-800 my-4 pt-4">
-                {user ? (
+                {userData?.user ? (
                   <>
                     <div className="flex items-center gap-3 px-3 mb-4">
                       <div className="w-8 h-8 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold text-sm">
-                        {user.username
-                          ? user.username.charAt(0).toUpperCase()
+                        {userData?.user.username
+                          ? userData?.user.username.charAt(0).toUpperCase()
                           : "U"}
                       </div>
                       <div>
                         <p className="text-white text-sm font-medium">
-                          {user.username}
+                          {userData?.user.username}
                         </p>
-                        <p className="text-slate-500 text-xs">{user.email}</p>
+                        <p className="text-slate-500 text-xs">
+                          {userData?.user.email}
+                        </p>
                       </div>
                     </div>
                     <button
