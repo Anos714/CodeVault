@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkUserStatus } from "./store/thunks/auth.thunks";
 import Loader from "./components/loader/Loader";
 import NotFound from "./components/not-found/NotFound";
+import { Analytics } from "@vercel/analytics/react";
 
 const App = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -50,6 +51,7 @@ const App = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
+      <Analytics />
     </>
   );
 };
