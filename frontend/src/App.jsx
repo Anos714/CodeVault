@@ -13,6 +13,7 @@ import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { checkUserStatus } from "./store/thunks/auth.thunks";
 import Loader from "./components/loader/Loader";
+import NotFound from "./components/not-found/NotFound";
 
 const App = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -45,6 +46,7 @@ const App = () => {
           <Route path="snippets/add" element={<AddSnippet />} />
           <Route path="snippets/edit/:id" element={<EditSnippet />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
     </>
