@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Lock, X, Menu, LogOut, LayoutDashboard, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
@@ -9,6 +9,8 @@ import { logoutUser } from "../../store/thunks/auth.thunks";
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const userData = useSelector((state) => state.auth.user);
@@ -63,15 +65,19 @@ const Navbar = () => {
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-8">
-              {["Features", "Solutions", "Tech Stack"].map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase().replace(" ", "-")}`}
-                  className="text-slate-400 hover:text-cyan-400 transition-colors duration-300 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
-                >
-                  {item}
-                </a>
-              ))}
+              {isHomePage && (
+                <>
+                  {["Features", "Solutions", "Tech Stack"].map((item) => (
+                    <a
+                      key={item}
+                      href={`#${item.toLowerCase().replace(" ", "-")}`}
+                      className="text-slate-400 hover:text-cyan-400 transition-colors duration-300 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
+                    >
+                      {item}
+                    </a>
+                  ))}
+                </>
+              )}
 
               {userData?.user ? (
                 <div className="relative" ref={dropdownRef}>

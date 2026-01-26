@@ -19,16 +19,20 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
       try {
         await api.post("/user/refresh");
         return api(originalRequest);
-      } catch (error) {
-        console.error("Session expired", error);
-
+      } catch (refreshError) {
         window.location.href = "/login";
-        return Promise.reject(error);
+        return Promise.reject(refreshError);
       }
     }
     return Promise.reject(error);

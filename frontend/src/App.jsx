@@ -12,6 +12,7 @@ import Snippets from "./pages/snippets/Snippets";
 import { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { checkUserStatus } from "./store/thunks/auth.thunks";
+import Loader from "./components/loader/Loader";
 
 const App = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -22,7 +23,7 @@ const App = () => {
     dispatch(checkUserStatus());
   }, []);
 
-  if (isCheckingAuth) return <h1>Loading....</h1>;
+  if (isCheckingAuth) return <Loader />;
   return (
     <>
       <Routes>
@@ -41,8 +42,8 @@ const App = () => {
         </Route>
 
         <Route element={<Protected />}>
-          <Route path="snippet/add" element={<AddSnippet />} />
-          <Route path="snippet/edit/:id" element={<EditSnippet />} />
+          <Route path="snippets/add" element={<AddSnippet />} />
+          <Route path="snippets/edit/:id" element={<EditSnippet />} />
         </Route>
       </Routes>
       <Toaster />

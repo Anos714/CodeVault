@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { SnippetModel } from "../models/Snippet.model.js";
 import {
   patchedSnippetSchema,
@@ -6,8 +7,8 @@ import {
 
 export const getAllSnippets = async (req, res, next) => {
   try {
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     let query = { visibility: "public" };
@@ -82,11 +83,11 @@ export const getSingleSnippetDetail = async (req, res, next) => {
 
 export const getUserSnippets = async (req, res, next) => {
   try {
-    const page = req.query.page || 1;
-    const limit = req.query.limit || 10;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { visibility: "private" };
+    let query = { owner: new mongoose.Types.ObjectId(req.user._id) };
 
     if (req.query.search) {
       query = {

@@ -10,10 +10,10 @@ import {
   AlertTriangle,
   Lightbulb,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  
-
+  const navigate = useNavigate();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -39,7 +39,6 @@ const Home = () => {
   return (
     <div>
       <section className="relative pt-32 pb-20 overflow-hidden bg-[#020617]">
-        {/* Background Gradients */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-cyan-500/10 rounded-full blur-3xl -z-10" />
         <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-blue-600/10 rounded-full blur-3xl -z-10" />
 
@@ -84,11 +83,17 @@ const Home = () => {
             transition={{ duration: 0.7, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-semibold text-lg shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 group cursor-pointer">
+            <button
+              onClick={() => navigate("/snippets")}
+              className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg font-semibold text-lg shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+            >
               Start Storing Code{" "}
               <ArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold text-lg border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <button
+              onClick={() => navigate("https://github.com/Anos714/CodeVault")}
+              className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-semibold text-lg border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
               <Github className="w-5 h-5" /> View on GitHub
             </button>
           </motion.div>
