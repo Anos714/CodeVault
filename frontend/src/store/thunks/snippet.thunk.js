@@ -48,3 +48,31 @@ export const getAllUserSnippets = createAsyncThunk(
     }
   },
 );
+
+export const getSnippetById = createAsyncThunk(
+  "snippet/getById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/snippet/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Error fetching snippet",
+      );
+    }
+  },
+);
+
+export const deleteSnippet = createAsyncThunk(
+  "snippet/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/snippet/delete/${id}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Error deleting snippet",
+      );
+    }
+  },
+);

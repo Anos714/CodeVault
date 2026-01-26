@@ -1,12 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addSnippet,
+  deleteSnippet,
   getAllPublicSnippets,
   getAllUserSnippets,
+  getSnippetById,
 } from "../thunks/snippet.thunk";
 
 const initialState = {
   snippets: [],
+  snippet: null,
   totalPages: 1,
   currentPage: 1,
   loading: true,
@@ -68,7 +71,27 @@ const snippetSlice = createSlice({
       .addCase(getAllPublicSnippets.rejected, handleRejected)
       .addCase(getAllUserSnippets.pending, handlePending)
       .addCase(getAllUserSnippets.fulfilled, handleFulfilled)
-      .addCase(getAllUserSnippets.rejected, handleRejected);
+      .addCase(getAllUserSnippets.rejected, handleRejected)
+      .addCase(getSnippetById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.snippet = null;
+      })
+      .addCase(getSnippetById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.snippet = action.payload.data;
+      })
+      .addCase(getSnippetById.rejected, handleRejected)
+
+      .addCase(deleteSnippet.pending, handlePending)
+      .addCase(deleteSnippet.fulfilled, (state, action) => {
+        state.loading = false;
+        state.snippet = null;
+        state.snippets = state.snippets.filter(
+          (s) => s._id !== action.meta.arg,
+        );
+      })
+      .addCase(deleteSnippet.rejected, handleRejected);
   },
 });
 export const { clearSnippets } = snippetSlice.actions;

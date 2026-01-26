@@ -18,11 +18,12 @@ import NotFound from "./components/not-found/NotFound";
 const App = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const isCheckingAuth = useSelector((state) => state.auth.isCheckingAuth);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(checkUserStatus());
-  }, []);
+  }, [dispatch]);
 
   if (isCheckingAuth) return <Loader />;
   return (

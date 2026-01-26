@@ -75,6 +75,7 @@ const authSlice = createSlice({
       })
 
       .addCase(checkUserStatus.pending, (state) => {
+        state.loading = true;
         state.isCheckingAuth = true;
       })
       .addCase(checkUserStatus.fulfilled, (state, action) => {

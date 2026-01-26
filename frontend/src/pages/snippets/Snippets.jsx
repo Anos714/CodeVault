@@ -33,8 +33,6 @@ const Snippets = () => {
     (state) => state.snippet,
   );
 
-  console.log(snippets);
-
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (activeTab === "my") {
