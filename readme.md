@@ -1,113 +1,222 @@
-# 🔐 CodeVault – The Developer’s Second Brain
+# 🚀 CodeVault – Your Modern Code Snippet Library
 
-![Status](https://img.shields.io/badge/Status-Work_in_Progress-yellow)
-![Stack](https://img.shields.io/badge/Stack-MERN-green)
-![License](https://img.shields.io/badge/License-MIT-blue)
+**CodeVault** is a powerful, developer-friendly application designed to store, manage, and share your code snippets efficiently. Built with the **MERN stack**, it offers a seamless experience with syntax highlighting, instant search, and a beautiful dark-themed UI.
 
-> 🚧 **Work in Progress**  
-> CodeVault is currently under active development. Features, UI, and architecture may change as the project evolves.
+🔗 **Live Demo:** https://codevault-olive.vercel.app/
 
 ---
 
-## 📌 Project Overview
+## 📸 Screenshots & Demo
 
-**CodeVault** is a developer productivity tool designed to solve the _“Déjà Code”_ problem — the frustration of knowing you’ve already written a piece of code but being unable to find it when you need it most.
+> ℹ️ Replace the placeholder image URLs below with real screenshots stored in a `screenshots/` folder.
 
-Instead of digging through old GitHub repositories, random text files, or bookmarked StackOverflow answers, CodeVault provides a **centralized, syntax-aware, and searchable cloud library** for your personal code snippets.
+|                                                                                          Home / Dashboard                                                                                           |                                                                                       Code Editor (Monaco)                                                                                       |
+| :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![Dashboard](https://media.licdn.com/dms/image/v2/D5622AQFp82Vv7zugug/feedshare-shrink_2048_1536/B56Zv7EitUI4Ak-/0/1769443830896?e=1770854400&v=beta&t=0HkdbWeX_qfL5ehdm78Jm55AQYDLHBkmnecvVla5Uvc) | ![Editor](https://media.licdn.com/dms/image/v2/D5622AQFBKMfP3ml0sw/feedshare-shrink_2048_1536/B56Zv7EiAZIYAk-/0/1769443827989?e=1770854400&v=beta&t=oRRDySxvrVmdB3GapZ3oIizCZNMkcVwLyI81vpfriq4) |
+|                                                                                   Browse and manage all snippets                                                                                    |                                                                          Add or edit snippets with syntax highlighting                                                                           |
 
----
-
-## ❓ The Problem
-
-Every developer encounters situations like:
-
-- Forgetting a useful utility function written months ago
-- Losing regex patterns, middleware logic, or configuration snippets
-- Rewriting solutions that already exist somewhere else
-
-Current solutions are fragmented and not optimized for code storage. Traditional note-taking apps lack syntax awareness and organization tailored for developers.
+|                                                                                          View Snippet                                                                                          |                                                                                      Responsive Mobile View                                                                                      |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![View Page](https://media.licdn.com/dms/image/v2/D5622AQGSMV2H5rZRFA/feedshare-shrink_1280/B56Zv7EiIDIUAc-/0/1769443828520?e=1770854400&v=beta&t=b1_vH17-_hwTaJNgKsQv9zZAWmRjjJucVf9QknYSNRI) | ![Mobile View](https://media.licdn.com/dms/image/v2/D5622AQFLC2SHUeEPpA/feedshare-shrink_1280/B56Zv7EhFxJ8Ac-/0/1769443824201?e=1770854400&v=beta&t=LX3lyRamB9XthJHfOAJtvpfUdr1YYoWZityis3h8ySQ) |
+|                                                                            Beautiful code viewer with copy feature                                                                             |                                                                                 Fully responsive on all devices                                                                                  |
 
 ---
 
-## 💡 The Solution
+## ✨ Features
 
-**CodeVault** treats code snippets as _first-class citizens_.
-
-It is purpose-built for developers and focuses on:
-
-- Writing code comfortably
-- Organizing snippets intelligently
-- Retrieving the right snippet instantly
-
----
-
-## ✨ Planned Features
-
-- 📝 **Native Coding Experience**  
-  Monaco Editor (VS Code engine) for familiar editing, indentation, and formatting
-
-- 🏷️ **Smart Tag-Based Organization**  
-  Organize snippets using tags like `#auth`, `#regex`, `#react-hooks`
-
-- 🔍 **Instant Search & Filtering**  
-  Find snippets by title, tags, or keywords in milliseconds
-
-- 🎨 **Syntax Highlighting**  
-  Automatic language detection for clear and readable code
-
-- 🔐 **Secure Authentication**  
-  Private snippets protected with JWT-based authentication
+- 🔐 **Secure Authentication** – JWT-based auth with HttpOnly cookies
+- 📝 **Full CRUD Support** – Create, read, update, and delete snippets
+- 🎨 **Syntax Highlighting** – Monaco Editor for writing, syntax highlighter for viewing
+- 🔍 **Advanced Search** – Debounced search by title or language
+- 🏷️ **Tagging System** – Organize snippets with custom tags
+- 🌓 **Dark Mode UI** – Clean developer-focused UI with Tailwind CSS
+- 📋 **One-Click Copy** – Instantly copy code snippets
+- 🔒 **Privacy Control** – Public or private snippets
 
 ---
 
-## 🧱 Tech Stack
-
-This project is built using the **MERN stack**:
+## 🛠️ Tech Stack
 
 ### Frontend
 
-- React.js
-- Monaco Editor (`@monaco-editor/react`)
-- Syntax highlighting utilities
+- React.js (Vite)
+- Redux Toolkit
+- Tailwind CSS
+- Framer Motion
+- Lucide React
+- Monaco Editor
+- React Syntax Highlighter
 
 ### Backend
 
 - Node.js
 - Express.js
-- RESTful API architecture
+- MongoDB & Mongoose
+- JWT Authentication
+- Bcrypt
+- Cookie Parser
 
-### Database
+### Deployment
 
-- MongoDB
-- Flexible schemas for multi-language snippets
-
-### Security
-
-- JSON Web Tokens (JWT)
-- Bcrypt password hashing
+- Vercel (Frontend & Backend)
 
 ---
 
-## 🗺️ Development Roadmap
 
-- [x] Project planning & architecture
-- [x] Backend API setup
-- [x] User authentication
-- [x] Snippet CRUD operations
-- [ ] Monaco Editor integration
-- [ ] Tagging & search system
-- [ ] UI/UX improvements
-- [ ] Deployment
+## 🚀 Getting Started
+
+Follow these steps to run CodeVault locally.
+
+### Prerequisites
+
+- Node.js (v16+ recommended)
+- MongoDB (Local or MongoDB Atlas)
+
+---
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/YourUsername/CodeVault.git
+cd CodeVault
+```
+
+### 2️⃣ Backend Setup
+
+```bash
+cd server
+npm install
+```
+
+## Create a .env file inside the server folder:
+
+```bash
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_key
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+## Start the backend server:
+
+```bash
+npm run dev
+```
+
+### 3️⃣ Frontend Setup
+
+```bash
+Open a new terminal:
+
+cd client
+npm install
+```
+
+## Create a .env file inside the client folder:
+
+```bash
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+## Start the frontend:
+
+```bash
+npm run dev
+
+
+Frontend will run at:
+👉 http://localhost:5173
+```
+
+# 🤝 Contributing
+
+Contributions are always welcome and greatly appreciated!  
+If you have ideas, improvements, or bug fixes, feel free to contribute.
 
 ---
 
-## 📈 Potential Impact
+## 🛠️ Steps to Contribute
 
-CodeVault aims to:
+1. **Fork the repository**
 
-- Reduce time wasted searching for old code
-- Eliminate duplicate problem-solving
-- Create a structured personal knowledge base
-- Improve overall developer productivity
+2. **Create your feature branch**
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+
+## 📝 Commit & Submit Changes
+
+After making your changes, follow these steps to submit your contribution:
+
+### 1️⃣ Commit Your Changes
+
+```bash
+git commit -m "Add AmazingFeature"
+```
+
+### 2️⃣ Push to Your Branch
+
+```bash
+git push origin feature/AmazingFeature
+```
+
+### 3️⃣ Open a Pull Request 🚀
+
+```bash
+Clearly describe the changes you’ve made
+
+Reference related issues if applicable
+```
+
+
+# 🗺️ Development Roadmap
+
+This roadmap outlines the current progress and future plans for the project.
 
 ---
+
+## ✅ Phase 1: MVP (Completed)
+
+Core features required for a functional and stable product.
+
+- User Authentication (Register / Login)
+- Create, Read, Update, Delete Snippets
+- Syntax Highlighting
+- Basic Search & Filtering
+- Responsive UI
+
+---
+
+## 🚧 Phase 2: Advanced Features (Upcoming)
+
+Enhancements focused on user engagement and better organization.
+
+- Social Sharing (public snippet links)
+- Likes & Comments
+- Collections / Folders
+- Profile Customization (avatar & bio)
+- Extended Language Support
+
+---
+
+## 🔮 Phase 3: Pro Features
+
+Advanced integrations and collaboration tools.
+
+- VS Code Extension
+- GitHub Gist Integration
+- Team Collaboration & Shared Workspaces
+
+---
+
+
+### 📞 Contact
+
+```bash
+Created by [Rahul Sain]
+
+GitHub: https://github.com/Anos714
+
+Email: sainrahul374@gmail.com
+```
