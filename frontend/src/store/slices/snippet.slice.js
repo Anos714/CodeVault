@@ -5,6 +5,7 @@ import {
   getAllPublicSnippets,
   getAllUserSnippets,
   getSnippetById,
+  updateSnippet,
 } from "../thunks/snippet.thunk";
 
 const initialState = {
@@ -91,7 +92,21 @@ const snippetSlice = createSlice({
           (s) => s._id !== action.meta.arg,
         );
       })
-      .addCase(deleteSnippet.rejected, handleRejected);
+      .addCase(deleteSnippet.rejected, handleRejected)
+
+      .addCase(updateSnippet.pending, handlePending)
+      .addCase(updateSnippet.fulfilled, (state, action) => {
+        state.loading = false;
+        state.snippet = action.payload.data;
+
+        const index = state.snippets.findIndex(
+          (s) => s._id === action.payload.data._id,
+        );
+        if (index !== -1) {
+          state.snippets[index] = action.payload.data;
+        }
+      })
+      .addCase(updateSnippet.rejected, handleRejected);
   },
 });
 export const { clearSnippets } = snippetSlice.actions;

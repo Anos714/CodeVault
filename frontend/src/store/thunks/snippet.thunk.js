@@ -76,3 +76,17 @@ export const deleteSnippet = createAsyncThunk(
     }
   },
 );
+
+export const updateSnippet = createAsyncThunk(
+  "snippet/update",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await api.patch(`/snippet/update/${id}`, data);
+      console.log(response);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message);
+    }
+  },
+);

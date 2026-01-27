@@ -15,6 +15,8 @@ import {
   Edit3,
   Globe,
   Lock,
+  ArrowBigLeft,
+  ArrowLeft,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { snippetSchema } from "../../utils/snippet";
@@ -83,6 +85,12 @@ const AddSnippet = () => {
     <div className="min-h-screen bg-[#020617] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
+          <h2
+            onClick={() => navigate("/snippets")}
+            className="text-sm text-white flex gap-2 pb-2 cursor-pointer"
+          >
+            <ArrowLeft /> Back to Library
+          </h2>
           <h2 className="text-3xl font-bold text-white">Create New Snippet</h2>
           <p className="text-slate-400 mt-2">
             Save your code logic for future use.

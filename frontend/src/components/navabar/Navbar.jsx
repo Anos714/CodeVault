@@ -139,7 +139,7 @@ const Navbar = () => {
                     Sign In
                   </button>
                   <button
-                    onClick={() => navigate("/register")}
+                    onClick={() => navigate("/snippets")}
                     className="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg shadow-cyan-500/20 transition-all hover:scale-105 active:scale-95"
                   >
                     Get Started
