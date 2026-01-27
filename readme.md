@@ -8,8 +8,6 @@
 
 ## 📸 Screenshots & Demo
 
-> ℹ️ Replace the placeholder image URLs below with real screenshots stored in a `screenshots/` folder.
-
 |                                                                                          Home / Dashboard                                                                                           |                                                                                       Code Editor (Monaco)                                                                                       |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | ![Dashboard](https://media.licdn.com/dms/image/v2/D5622AQFp82Vv7zugug/feedshare-shrink_2048_1536/B56Zv7EitUI4Ak-/0/1769443830896?e=1770854400&v=beta&t=0HkdbWeX_qfL5ehdm78Jm55AQYDLHBkmnecvVla5Uvc) | ![Editor](https://media.licdn.com/dms/image/v2/D5622AQFBKMfP3ml0sw/feedshare-shrink_2048_1536/B56Zv7EiAZIYAk-/0/1769443827989?e=1770854400&v=beta&t=oRRDySxvrVmdB3GapZ3oIizCZNMkcVwLyI81vpfriq4) |
@@ -61,7 +59,6 @@
 - Vercel (Frontend & Backend)
 
 ---
-
 
 ## 🚀 Getting Started
 
@@ -169,7 +166,6 @@ Clearly describe the changes you’ve made
 Reference related issues if applicable
 ```
 
-
 # 🗺️ Development Roadmap
 
 This roadmap outlines the current progress and future plans for the project.
@@ -209,7 +205,6 @@ Advanced integrations and collaboration tools.
 - Team Collaboration & Shared Workspaces
 
 ---
-
 
 ### 📞 Contact
 
