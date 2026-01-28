@@ -215,3 +215,6 @@ GitHub: https://github.com/Anos714
 
 Email: sainrahul374@gmail.com
 ```
+
+## License
+This project is licensed under the MIT License.
