@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 type GoogleButtonProps = {
   label?: string;
   className?: string;
+  onClick?: () => void;
 };
 
 /**
@@ -15,10 +16,12 @@ type GoogleButtonProps = {
 export function GoogleButton({
   label = "Continue with Google",
   className,
+  onClick,
 }: GoogleButtonProps) {
   return (
     <motion.button
       type="button"
+      onClick={onClick}
       whileHover={{ y: -1 }}
       whileTap={{ y: 0, scale: 0.99 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
