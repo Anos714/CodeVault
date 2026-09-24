@@ -79,7 +79,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       ref={buttonRef}
       type="button"
       aria-label="Toggle theme"
-      title={isDark ? "Switch to light" : "Switch to dark"}
+      // `resolvedTheme` is undefined during SSR, so gate the theme-dependent
+      // title on mount to keep server and client output identical.
+      title={mounted ? (isDark ? "Switch to light" : "Switch to dark") : undefined}
       onClick={handleToggle}
       className={cn(
         "relative inline-flex size-9 items-center justify-center rounded-lg border border-border bg-background/60 text-foreground/80 transition-colors hover:bg-muted hover:text-foreground",
