@@ -1,91 +1,159 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Logo } from "@/components/brand/logo";
+import { LegalLayout } from "@/components/layout/legal-layout";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How CodeVault handles your data — snippets, account information, and cookies.",
+    "How CodeVault handles your snippets, account information, and cookies — explained in plain language.",
 };
+
+const sections = [
+  {
+    id: "what-we-collect",
+    title: "What we collect",
+    body: (
+      <>
+        <p>
+          Only what CodeVault needs to work. When you create an account we
+          store your <strong>username</strong> and <strong>email</strong>, plus
+          a scrambled (hashed) version of your password. We never see or store
+          your password in plain text — not even briefly.
+        </p>
+        <p>
+          Everything else is the content you choose to save: a snippet&apos;s{" "}
+          <strong>title, description, code, language, tags</strong>, and whether
+          it&apos;s public or private.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "how-we-use-it",
+    title: "How we use it",
+    body: (
+      <ul>
+        <li>To sign you in and keep you signed in, securely.</li>
+        <li>To show you your own snippets, exactly as you saved them.</li>
+        <li>To power search, so you can find that regex you wrote in 2023.</li>
+        <li>
+          That&apos;s it. No analytics on your code, no training models on your
+          snippets, no selling anything to anyone.
+        </li>
+      </ul>
+    ),
+  },
+  {
+    id: "public-private",
+    title: "Public vs. private snippets",
+    body: (
+      <>
+        <p>
+          Every snippet is <strong>private by default</strong>. Only you can see
+          it. Nothing about a private snippet is shown to anyone else.
+        </p>
+        <p>
+          If you flip a snippet to <strong>public</strong>, it appears in the
+          public library and anyone can view it. You can switch it back to
+          private at any time — but keep in mind that something already viewed
+          or copied may have been saved elsewhere.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "cookies",
+    title: "Cookies & tokens",
+    body: (
+      <p>
+        CodeVault uses two <strong>HttpOnly cookies</strong> to keep you logged
+        in: a short-lived access token (15 minutes) and a refresh token (7
+        days). They&apos;re marked HttpOnly, which means JavaScript on a page
+        can&apos;t read them, and they&apos;re sent only over secure
+        connections in production. We don&apos;t use third-party tracking
+        cookies.
+      </p>
+    ),
+  },
+  {
+    id: "third-parties",
+    title: "Who else sees your data",
+    body: (
+      <p>
+        The hosted demo runs on Vercel and stores data in MongoDB Atlas — both
+        see only encrypted data in transit and at rest, and neither reads your
+        snippets. If you self-host CodeVault (it&apos;s open source and you&apos;re
+        welcome to), no third party is involved at all.
+      </p>
+    ),
+  },
+  {
+    id: "your-rights",
+    title: "Your rights & your data",
+    body: (
+      <ul>
+        <li>
+          <strong>Export</strong> — copy any snippet to your clipboard in one
+          click, any time.
+        </li>
+        <li>
+          <strong>Delete</strong> — remove any snippet permanently. It&apos;s
+          gone, not archived.
+        </li>
+        <li>
+          <strong>Own it</strong> — your code is yours. CodeVault is a tool for
+          storing it, not a claim on it.
+        </li>
+      </ul>
+    ),
+  },
+  {
+    id: "security",
+    title: "Security",
+    body: (
+      <p>
+        Passwords are hashed with bcrypt, sessions are token-based rather than
+        stateful, and access tokens expire quickly by design. No system is
+        perfect, but if we ever found a real issue affecting your data we&apos;d
+        disclose it openly — the project is public.
+      </p>
+    ),
+  },
+  {
+    id: "contact",
+    title: "Questions",
+    body: (
+      <p>
+        If something here is unclear or you want a specific piece of your data
+        removed, open an issue on{" "}
+        <a
+          href="https://github.com/Anos714/CodeVault"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub
+        </a>{" "}
+        or email{" "}
+        <a href="mailto:sainrahul374@gmail.com">sainrahul374@gmail.com</a>.
+      </p>
+    ),
+  },
+];
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-5 pb-24 pt-32 sm:px-8 sm:pt-40">
-      <Link href="/" aria-label="CodeVault home">
-        <Logo />
-      </Link>
-      <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-        Privacy Policy
-      </h1>
-      <p className="mt-3 font-mono text-sm text-muted-foreground">
-        Last updated: {new Date().getFullYear()}
-      </p>
-
-      <div className="prose-custom mt-10 flex flex-col gap-8 text-[0.94rem] leading-relaxed text-muted-foreground">
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
-            What we store
+    <LegalLayout
+      title="Privacy Policy"
+      updated="September 2026"
+      intro="The short version: CodeVault stores the code you save and almost nothing else. This page explains exactly what that means, in plain language — no legalese, no surprises."
+    >
+      {sections.map(({ id, title, body }) => (
+        <section key={id} id={id}>
+          <h2 className="mb-3 text-lg font-semibold text-foreground">
+            {title}
           </h2>
-          <p>
-            CodeVault stores the snippets you save — title, description, code,
-            language, tags, and visibility — along with your account details
-            (username, email, and a bcrypt-hashed password). We never store
-            passwords in plain text.
-          </p>
+          <div className="flex flex-col gap-4">{body}</div>
         </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
-            Public vs. private snippets
-          </h2>
-          <p>
-            Snippets are private by default. Only you can see them. If you mark
-            a snippet as public, it becomes viewable by anyone browsing the
-            public library.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
-            Cookies
-          </h2>
-          <p>
-            We use HttpOnly cookies to keep you signed in. These contain a
-            short-lived access token and a refresh token — no personal data is
-            stored client-side.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
-            Your data is yours
-          </h2>
-          <p>
-            CodeVault is open source and self-hostable. You can export or delete
-            your snippets at any time, and running your own instance means your
-            data never leaves your infrastructure.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mb-2 text-lg font-semibold text-foreground">
-            Questions
-          </h2>
-          <p>
-            This page is a summary — the full legal text is being finalized.
-            Reach out via{" "}
-            <a
-              href="https://github.com/Anos714/CodeVault"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
-            >
-              GitHub
-            </a>{" "}
-            with any questions.
-          </p>
-        </section>
-      </div>
-    </div>
+      ))}
+    </LegalLayout>
   );
 }
