@@ -197,6 +197,50 @@
   color: transparent;
 }
 
+/* ------------------------------------------------------------
+   Legal / long-form prose
+   ------------------------------------------------------------ */
+.prose-legal h2 {
+  scroll-margin-top: 6rem;
+}
+.prose-legal p {
+  text-pretty: balance;
+}
+.prose-legal a {
+  color: var(--primary);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-legal a:hover {
+  text-decoration: underline;
+}
+.prose-legal ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  list-style: none;
+}
+.prose-legal li {
+  position: relative;
+  padding-left: 0.1rem;
+}
+.prose-legal li::before {
+  content: "";
+  position: absolute;
+  left: -0.95rem;
+  top: 0.62em;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--primary) 70%, transparent);
+}
+.prose-legal strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
 /* shimmer line used on the animated code window */
 @keyframes shimmer-x {
   0% { transform: translateX(-120%); }
@@ -246,5 +290,28 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Theme-switch view transition — radial sweep from the toggle
+   ============================================================ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 9999;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
   }
 }
