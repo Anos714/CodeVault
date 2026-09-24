@@ -100,7 +100,7 @@ export function CTA() {
             <Button
               size="lg"
               className="h-11 gap-2 rounded-full px-7 text-[0.92rem] shadow-lg shadow-primary/20"
-              render={<Link href="/snippets" />}
+              render={<Link href="/auth" />}
             >
               Open the app
               <ArrowRight className="size-4" />

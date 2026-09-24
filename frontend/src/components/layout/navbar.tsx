@@ -103,7 +103,7 @@ export function Navbar() {
           <ThemeToggle />
           <Button
             size="lg"
-            render={<Link href="/snippets" />}
+            render={<Link href="/auth" />}
             className="hidden h-9 gap-1.5 rounded-full px-4 sm:inline-flex"
           >
             Open the app
