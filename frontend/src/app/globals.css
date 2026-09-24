@@ -145,8 +145,9 @@
 }
 
 /* ============================================================
-   Background patterns — subtle dev-grid + dots
+   Background patterns
    ============================================================ */
+
 .bg-grid {
   background-image:
     linear-gradient(to right, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px),
@@ -154,6 +155,7 @@
   background-size: 56px 56px;
 }
 
+/* faint dot grid */
 .bg-dots {
   background-image: radial-gradient(
     color-mix(in oklch, var(--foreground) 14%, transparent) 1px,

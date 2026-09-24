@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowRight, Menu, X } from "lucide-react";
@@ -21,6 +21,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { isMobileMenuOpen, toggleMobileMenu, setMobileMenuOpen } =
     useUIStore();
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -29,8 +30,37 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // close the mobile menu when clicking (or touching) outside of it
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      if (!headerRef.current?.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("touchstart", onPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("touchstart", onPointerDown);
+    };
+  }, [isMobileMenuOpen, setMobileMenuOpen]);
+
+  // lock body scroll while the drawer is open
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header
+      ref={headerRef}
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
@@ -88,11 +118,31 @@ export function Navbar() {
             aria-expanded={isMobileMenuOpen}
             className="inline-flex size-9 items-center justify-center rounded-lg border border-border bg-background/60 text-foreground transition-colors hover:bg-muted md:hidden"
           >
-            {isMobileMenuOpen ? (
-              <X className="size-[1.05rem]" />
-            ) : (
-              <Menu className="size-[1.05rem]" />
-            )}
+            <AnimatePresence mode="wait" initial={false}>
+              {isMobileMenuOpen ? (
+                <motion.span
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute flex items-center justify-center"
+                >
+                  <X className="size-[1.05rem]" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="open"
+                  initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute flex items-center justify-center"
+                >
+                  <Menu className="size-[1.05rem]" />
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
         </div>
       </nav>

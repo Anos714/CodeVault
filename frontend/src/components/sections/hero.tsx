@@ -6,6 +6,7 @@ import { ArrowRight, Star } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import { CodeWindow } from "@/components/site/code-window";
+import { HeroBackground } from "@/components/site/hero-background";
 import { demoSnippets } from "@/lib/snippets";
 import { fadeUp, staggerContainer, easeOutExpo } from "@/lib/motion";
 
@@ -26,11 +27,7 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden pt-32 pb-20 sm:pt-40 sm:pb-28">
-      {/* backdrop */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-grid mask-fade opacity-70" />
-        <div className="absolute left-1/2 top-0 h-[520px] w-[820px] -translate-x-1/2 glow-brand" />
-      </div>
+      <HeroBackground />
 
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-5 sm:px-8 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
         {/* copy */}
