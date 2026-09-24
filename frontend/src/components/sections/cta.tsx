@@ -1,0 +1,134 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "motion/react";
+import { ArrowRight } from "lucide-react";
+import { FaGithub } from "react-icons/fa6";
+import { Button } from "@/components/ui/button";
+import { LogoMark } from "@/components/brand/logo";
+import { fadeUp, staggerContainer, inViewProps } from "@/lib/motion";
+import { cn } from "@/lib/utils";
+
+const chips = [
+  { label: "{ }", className: "text-syntax-keyword", pos: "left-[6%] top-[16%] md:left-[10%]" },
+  { label: "</>", className: "text-syntax-function", pos: "right-[7%] top-[24%] md:right-[11%]" },
+  { label: "#auth", className: "text-primary", pos: "left-[12%] bottom-[18%] md:left-[16%]" },
+  { label: "const", className: "text-syntax-string", pos: "right-[12%] bottom-[22%] md:right-[15%]" },
+];
+
+export function CTA() {
+  return (
+    <section className="relative py-20 sm:py-28">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <motion.div
+          variants={staggerContainer(0.1)}
+          {...inViewProps}
+          className="relative flex flex-col items-center gap-8 overflow-hidden rounded-3xl border border-border bg-card/40 px-6 py-20 text-center sm:px-12 sm:py-24"
+        >
+          {/* layered backdrop */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-grid opacity-50 mask-fade" />
+            <motion.div
+              animate={{ x: [-30, 30, -30], y: [-10, 14, -10] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute left-1/2 top-1/2 h-[340px] w-[560px] -translate-x-1/2 -translate-y-1/2 glow-brand"
+            />
+            <motion.div
+              animate={{ x: [24, -24, 24], y: [12, -12, 12] }}
+              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute right-[14%] top-[10%] h-44 w-44 rounded-full bg-syntax-function/10 blur-3xl"
+            />
+            <motion.div
+              animate={{ x: [-18, 18, -18], y: [-8, 10, -8] }}
+              transition={{ duration: 13, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-[8%] left-[12%] h-40 w-40 rounded-full bg-syntax-keyword/10 blur-3xl"
+            />
+          </div>
+
+          {/* top highlight line */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+          />
+
+          {/* floating syntax chips */}
+          {chips.map((chip) => (
+            <motion.span
+              key={chip.label}
+              aria-hidden
+              animate={{ y: [0, -10, 0] }}
+              transition={{
+                duration: 4.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: chip.label.length * 0.3,
+              }}
+              className={cn(
+                "pointer-events-none absolute hidden font-mono text-sm rounded-lg border border-border bg-card/80 px-2.5 py-1.5 backdrop-blur md:block",
+                chip.pos,
+                chip.className,
+              )}
+            >
+              {chip.label}
+            </motion.span>
+          ))}
+
+          <motion.div variants={fadeUp}>
+            <LogoMark className="size-16" animated />
+          </motion.div>
+
+          <motion.h2
+            variants={fadeUp}
+            className="max-w-2xl text-balance text-3xl font-semibold leading-[1.1] tracking-tight text-foreground sm:text-4xl lg:text-5xl"
+          >
+            Stop rewriting code.{" "}
+            <span className="text-gradient-brand">Start reusing it.</span>
+          </motion.h2>
+
+          <motion.p
+            variants={fadeUp}
+            className="max-w-xl text-pretty text-base leading-relaxed text-muted-foreground"
+          >
+            Your future self will thank you. Vault your first snippet in under a
+            minute — free, open source, and no credit card in sight.
+          </motion.p>
+
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-col gap-3 sm:flex-row"
+          >
+            <Button
+              size="lg"
+              className="h-11 gap-2 rounded-full px-7 text-[0.92rem] shadow-lg shadow-primary/20"
+              render={<Link href="/auth" />}
+            >
+              Open the app
+              <ArrowRight className="size-4" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-11 gap-2 rounded-full px-7 text-[0.92rem]"
+              render={
+                <a
+                  href="https://github.com/Anos714/CodeVault"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              <FaGithub className="size-4" /> Star on GitHub
+            </Button>
+          </motion.div>
+
+          <motion.p
+            variants={fadeUp}
+            className="font-mono text-xs text-muted-foreground/70"
+          >
+            MIT licensed · self-hostable · your code stays yours
+          </motion.p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
