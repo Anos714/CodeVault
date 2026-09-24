@@ -45,25 +45,22 @@ export function HowItWorks() {
         />
 
         <div className="relative mt-14">
-          {/* connector line (desktop) */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, amount: 0.4 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-0 right-0 top-9 hidden h-px origin-left bg-gradient-to-r from-transparent via-border to-transparent md:block"
-          />
+          {/* connector line with a traveling light pulse (desktop) */}
+          <div className="pointer-events-none absolute inset-x-0 top-9 hidden h-px md:block">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <div className="absolute left-0 top-1/2 h-px w-16 -translate-y-1/2 animate-travel-x bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_8px_var(--primary)]" />
+          </div>
 
           <motion.div
             variants={staggerContainer(0.14)}
             {...inViewProps}
-            className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8"
+            className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8"
           >
             {steps.map(({ icon: Icon, step, title, description }) => (
               <motion.div
                 key={step}
                 variants={fadeUp}
-                className="relative flex flex-col items-center text-center md:items-start md:text-left"
+                className="relative flex flex-col items-center text-center"
               >
                 <div className="relative mb-6 flex size-18 items-center justify-center rounded-2xl border border-border bg-card">
                   <div className="absolute inset-0 rounded-2xl bg-primary/5" />

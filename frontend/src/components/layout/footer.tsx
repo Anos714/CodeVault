@@ -30,6 +30,13 @@ const footerLinks: { heading: string; links: FooterLink[] }[] = [
       },
     ],
   },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    ],
+  },
 ];
 
 const socials = [
@@ -64,7 +71,7 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-10 sm:gap-16">
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-12 lg:gap-20">
             {footerLinks.map(({ heading, links }) => (
               <div key={heading} className="flex flex-col gap-3.5">
                 <h4 className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground/70">
