@@ -2,6 +2,17 @@ import type { Language } from "@/lib/languages";
 
 export type Visibility = "private" | "public";
 
+export type ShareLink = {
+  /** opaque token in the /s/[token] URL */
+  token: string;
+  /** ISO datestring, or null for a link that never expires */
+  expiresAt: string | null;
+  /** ISO datestring the link was minted */
+  createdAt: string;
+  /** set when the owner revokes the link */
+  revoked: boolean;
+};
+
 export type Snippet = {
   id: string;
   title: string;
@@ -17,6 +28,11 @@ export type Snippet = {
   copies: number;
   createdAt: string;
   updatedAt: string;
+  /** unlisted share links minted from a private snippet */
+  shareLinks?: ShareLink[];
+  /** id of the snippet this one was forked from, if any */
+  forkedFromId?: string;
+  forkedFromAuthor?: string;
 };
 
 /**

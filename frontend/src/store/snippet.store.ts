@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import type { Snippet, Visibility } from "@/lib/snippet-data";
+import type { Snippet, Visibility, ShareLink } from "@/lib/snippet-data";
 import { seedSnippets } from "@/lib/snippet-data";
 import type { Language } from "@/lib/languages";
+import { mintShareLink, type ShareExpiryDays } from "@/lib/share";
 
 export type NewSnippet = {
   title: string;
@@ -21,6 +22,12 @@ type SnippetState = {
   deleteSnippet: (id: string) => void;
   toggleFavorite: (id: string) => void;
   incrementCopies: (id: string) => void;
+  /** mint an unlisted /s/[token] link off a private snippet */
+  createShareLink: (id: string, expiry: ShareExpiryDays) => ShareLink | null;
+  /** invalidate every outstanding link for a snippet */
+  revokeShareLinks: (id: string) => void;
+  /** copy someone else's snippet into your own vault, crediting the original */
+  forkSnippet: (id: string, author: { id: string; name: string }) => Snippet | null;
 };
 
 const byUpdated = (a: Snippet, b: Snippet) =>
@@ -90,4 +97,57 @@ export const useSnippetStore = create<SnippetState>((set) => ({
         snippet.id === id ? { ...snippet, copies: snippet.copies + 1 } : snippet,
       ),
     })),
+
+  createShareLink: (id, expiry) => {
+    let created: ShareLink | null = null;
+    set((state) => ({
+      snippets: state.snippets.map((snippet) => {
+        if (snippet.id !== id) return snippet;
+        // carry over any prior links so revocation history isn't lost
+        const links = [...(snippet.shareLinks ?? []), (created = mintShareLink(expiry))];
+        return { ...snippet, shareLinks: links, updatedAt: new Date().toISOString() };
+      }),
+    }));
+    return created;
+  },
+
+  revokeShareLinks: (id) =>
+    set((state) => ({
+      snippets: state.snippets.map((snippet) =>
+        snippet.id === id && snippet.shareLinks?.length
+          ? {
+              ...snippet,
+              shareLinks: snippet.shareLinks.map((link) => ({
+                ...link,
+                revoked: true,
+              })),
+              updatedAt: new Date().toISOString(),
+            }
+          : snippet,
+      ),
+    })),
+
+  forkSnippet: (id, author) => {
+    const original = useSnippetStore.getState().snippets.find((s) => s.id === id);
+    if (!original) return null;
+
+    const now = new Date().toISOString();
+    const fork: Snippet = {
+      ...original,
+      id: `snip_${crypto.randomUUID()}`,
+      authorId: author.id,
+      authorName: author.name,
+      // a fork starts private and loses the original's share links
+      visibility: "private",
+      shareLinks: [],
+      favorites: 0,
+      copies: 0,
+      createdAt: now,
+      updatedAt: now,
+      forkedFromId: original.id,
+      forkedFromAuthor: original.authorName,
+    };
+    set((state) => ({ snippets: [fork, ...state.snippets] }));
+    return fork;
+  },
 }));
