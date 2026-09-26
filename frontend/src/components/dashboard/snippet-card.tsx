@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { Check, Copy, Globe, Lock, Star, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ForkButton } from "@/components/dashboard/fork-button";
 import { LANGUAGE_META } from "@/lib/languages";
 import type { Snippet } from "@/lib/snippet-data";
 import { useSnippetStore } from "@/store/snippet.store";
@@ -182,6 +183,7 @@ export function SnippetCard({
             )}
             {copied ? "Copied" : "Copy"}
           </button>
+          <ForkButton snippetId={snippet.id} label="Fork" />
           {onDelete && (
             <button
               type="button"

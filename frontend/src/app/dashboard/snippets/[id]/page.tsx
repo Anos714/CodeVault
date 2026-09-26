@@ -8,7 +8,9 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  GitFork,
   Globe,
+  Link2,
   Lock,
   Pencil,
   Star,
@@ -17,6 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeEditor } from "@/components/dashboard/code-editor";
+import { ShareDialog } from "@/components/dashboard/share-dialog";
+import { ForkButton } from "@/components/dashboard/fork-button";
 import { LANGUAGE_META } from "@/lib/languages";
 import { useSnippetStore } from "@/store/snippet.store";
 import { useAuthStore } from "@/store/auth.store";
@@ -56,6 +60,7 @@ export default function SnippetDetailPage({
 
   const [copied, setCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   if (!snippet) {
     return (
@@ -202,6 +207,31 @@ export default function SnippetDetailPage({
             {snippet.favorites}
           </Button>
 
+          <Button
+            variant="outline"
+            className="h-9 gap-2 rounded-xl px-4"
+            onClick={() => setShareOpen(true)}
+          >
+            <Link2 className="size-4" />
+            Share
+          </Button>
+          {!isOwner && (
+            <ForkButton
+              snippetId={snippet.id}
+              variant="outline"
+              className="h-9 rounded-xl px-4 font-medium"
+            />
+          )}
+          {snippet.forkedFromId && (
+            <Link
+              href={`/dashboard/snippets/${snippet.forkedFromId}`}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-border px-3 py-1.5 font-mono text-[0.68rem] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <GitFork className="size-3.5" />
+              forked from {snippet.forkedFromAuthor}
+            </Link>
+          )}
+
           <span className="ml-auto font-mono text-xs text-muted-foreground">
             updated {relativeTime(snippet.updatedAt)}
           </span>
@@ -263,6 +293,12 @@ export default function SnippetDetailPage({
           </motion.div>
         )}
       </motion.div>
+
+      <ShareDialog
+        snippet={snippet}
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+      />
     </div>
   );
 }
