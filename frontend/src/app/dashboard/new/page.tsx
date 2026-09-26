@@ -6,11 +6,13 @@ import { motion } from "motion/react";
 import { Check, Globe, Lock, Sparkles } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { CodeEditor } from "@/components/dashboard/code-editor";
+import { TemplatePicker } from "@/components/dashboard/template-picker";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGES, LANGUAGE_META } from "@/lib/languages";
 import type { Visibility } from "@/lib/snippet-data";
+import type { SnippetTemplate } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { easeOutExpo } from "@/lib/motion";
 
@@ -41,6 +43,15 @@ export default function NewSnippetPage() {
     if (tags.length >= MAX_TAGS) return;
     setTags((prev) => [...prev, normalized]);
     setTagDraft("");
+  };
+
+  const applyTemplate = (template: SnippetTemplate) => {
+    setLanguage(template.language);
+    setTitle(template.title);
+    setDescription(template.description);
+    setTags(template.tags);
+    setCode(template.code);
+    setErrors({});
   };
 
   const removeTag = (tag: string) => {
@@ -95,6 +106,8 @@ export default function NewSnippetPage() {
       >
         {/* ---------- form ---------- */}
         <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card/40 p-5">
+          <TemplatePicker language={language} onPick={applyTemplate} />
+
           <Field label="Title" error={errors.title} htmlFor="snippet-title">
             <input
               id="snippet-title"
