@@ -1,0 +1,15 @@
+# Backend-specific secrets and local tooling — never commit.
+.env
+.env.*
+!.env.example
+
+# The backend Architecture.md is a working spec, not shipped docs.
+Architecture.md
+
+# Drizzle migration output snapshots and local state
+drizzle/meta/_journal.json
+*.local
+
+# Postgres/Drizzle local artifacts
+postgres-data/
+drizzle.zip
