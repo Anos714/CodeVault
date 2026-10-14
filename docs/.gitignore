@@ -3,9 +3,6 @@
 .env.*
 !.env.example
 
-# The backend Architecture.md is a working spec, not shipped docs.
-Architecture.md
-
 # Drizzle migration output snapshots and local state
 drizzle/meta/_journal.json
 *.local
