@@ -214,7 +214,9 @@ Deep dive: `docs/Architecture.md` (working spec, git-ignored).
 | Document | What's in it |
 | -------- | ------------ |
 | [`frontend/.env.example`](frontend/.env.example) | Every environment variable, annotated |
-| `docs/Architecture.md` | Schema, auth flow, server actions, DAL contract, route inventory (local working spec) |
+| [`docs/architecture.md`](docs/architecture.md) | Mental model, rendering split, DAL, actions, auth, security model |
+| [`docs/api.md`](docs/api.md) | Every server action, DAL query and auth route: inputs, returns, status codes |
+| [`docs/deployment.md`](docs/deployment.md) | Production env setup, OAuth callbacks, degradation matrix, checklists |
 | [`frontend/drizzle/`](frontend/drizzle/) | The applied migrations — the schema's reviewable history |
 
 ## Deployment
