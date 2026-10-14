@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "developer tools",
     "syntax highlighting",
     "Monaco editor",
-    "MERN",
+    "Next.js",
     "code search",
     "programming",
   ],
