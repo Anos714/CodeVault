@@ -8,7 +8,7 @@ import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SnippetCard } from "@/components/dashboard/snippet-card";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,8 @@ export default function SnippetsPage() {
 }
 
 function SnippetsPageContent() {
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const snippets = useSnippetStore((state) => state.snippets);
   const deleteSnippet = useSnippetStore((state) => state.deleteSnippet);
 

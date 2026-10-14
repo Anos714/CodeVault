@@ -17,12 +17,24 @@ import * as schema from "./schema";
 
 const connectionString = process.env.DATABASE_URL;
 
-if (!connectionString) {
-  throw new Error(
-    "DATABASE_URL is not set. Copy .env.example to .env.local and fill in the Neon connection string.",
-  );
-}
-
-export const db = drizzle(neon(connectionString), { schema });
+/**
+ * The client is created lazily: `DATABASE_URL` may be absent during a
+ * cold `next build` (no database is touched there — pages stay dynamic),
+ * so the configuration error must fire on first *use*, not on import.
+ * Without this, merely importing a server component that reaches for
+ * the database would fail the build before any credentials exist.
+ */
+export const db = connectionString
+  ? drizzle(neon(connectionString), { schema })
+  : (new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(
+            "DATABASE_URL is not set. Copy .env.example to .env.local and fill in the Neon connection string.",
+          );
+        },
+      },
+    ) as unknown as ReturnType<typeof drizzle>);
 
 export type Database = typeof db;

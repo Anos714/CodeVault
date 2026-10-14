@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check, GitFork } from "lucide-react";
 import { useSnippetStore } from "@/store/snippet.store";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 type ForkButtonProps = {
@@ -28,7 +28,8 @@ export function ForkButton({
 }: ForkButtonProps) {
   const router = useRouter();
   const forkSnippet = useSnippetStore((state) => state.forkSnippet);
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const snippets = useSnippetStore((state) => state.snippets);
   const [forked, setForked] = useState(false);
 
@@ -37,7 +38,10 @@ export function ForkButton({
 
   const handleFork = () => {
     if (!user) return;
-    const fork = forkSnippet(snippetId, { id: user.id, name: user.name });
+    const fork = forkSnippet(snippetId, {
+      id: user.id,
+      name: user.name ?? "developer",
+    });
     if (!fork) return;
     setForked(true);
     setTimeout(() => router.push(`/dashboard/snippets/${fork.id}`), 500);

@@ -23,7 +23,7 @@ import { ShareDialog } from "@/components/dashboard/share-dialog";
 import { ForkButton } from "@/components/dashboard/fork-button";
 import { LANGUAGE_META } from "@/lib/languages";
 import { useSnippetStore } from "@/store/snippet.store";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +56,8 @@ export default function SnippetDetailPage({
   const favorites = useSnippetStore((state) => state.favorites);
   const toggleFavorite = useSnippetStore((state) => state.toggleFavorite);
   const deleteSnippet = useSnippetStore((state) => state.deleteSnippet);
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
 
   const [copied, setCopied] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);

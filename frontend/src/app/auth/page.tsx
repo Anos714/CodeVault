@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthSplit } from "@/components/layout/auth-split";
-import { GoogleButton } from "@/components/site/google-button";
+import { SignInOptions } from "@/components/site/sign-in-options";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to CodeVault with Google to access your code snippets.",
+  description: "Sign in to CodeVault with Google or GitHub to access your code snippets.",
 };
 
 export default function AuthPage() {
@@ -17,20 +17,12 @@ export default function AuthPage() {
             Get started
           </h1>
           <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
-            One account, one click. Sign in with Google and your vault is
-            waiting — snippets, tags, and history, exactly as you left them.
+            One account, one click. Sign in and your vault is waiting —
+            snippets, tags, and history, exactly as you left it.
           </p>
         </div>
 
-        <GoogleButton label="Continue with Google" />
-
-        <div className="flex items-center gap-3">
-          <span className="h-px flex-1 bg-border" />
-          <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground/60">
-            More options soon
-          </span>
-          <span className="h-px flex-1 bg-border" />
-        </div>
+        <SignInOptions />
 
         <p className="text-center font-mono text-xs text-muted-foreground/60">
           By continuing you agree to our{" "}
