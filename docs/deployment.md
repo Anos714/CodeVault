@@ -18,6 +18,7 @@ Know what a missing variable costs before you ship:
 | OAuth credentials (one provider) | Sign-in with the other provider + demo | That provider is skipped — no broken redirects |
 | OAuth credentials (both) | Demo sign-in carries the whole experience | Google/GitHub buttons |
 | `NEXT_PUBLIC_SITE_URL` | Everything else | Sitemap/OG fall back to `BETTER_AUTH_URL` |
+| `UPSTASH_*` | Everything else | Sliding-window limits (demo/share/writes) fail open — nothing throttled |
 
 ## 2. Required environment
 
@@ -33,6 +34,8 @@ DATABASE_URL_UNPOOLED=postgresql://user:password@host/db?sslmode=require        
 BETTER_AUTH_SECRET=<bunx @better-auth/cli secret>
 BETTER_AUTH_URL=https://your-domain.com
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
+UPSTASH_REDIS_REST_URL=https://….upstash.io      # optional — rate limiting
+UPSTASH_REDIS_REST_TOKEN=…                       # optional — rate limiting
 ```
 
 - **Neon:** create a project, copy the **pooled** string into `DATABASE_URL`
@@ -119,6 +122,7 @@ Run through this once on a fresh production URL:
 - [ ] `BETTER_AUTH_SECRET` is a strong random value, not the dev one
 - [ ] `BETTER_AUTH_URL` matches the public origin exactly
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the public origin
+- [ ] `UPSTASH_REDIS_REST_URL`/`TOKEN` set (or consciously skipped — limiting fails open)
 - [ ] OAuth callback URLs updated for the real domain (+ localhost pair kept on the same clients)
 - [ ] `bun run lint`, `bun run typecheck`, `bun run build` all pass in CI
 - [ ] HTTPS enforced by the host; secure cookie variant confirmed in devtools

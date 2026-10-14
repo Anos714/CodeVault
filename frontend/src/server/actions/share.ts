@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/server/auth";
+import { checkLimit } from "@/server/ratelimit";
 import { db } from "@/server/db";
 import { shareLinks, snippets } from "@/server/db/schema";
 import { shareExpirySchema, snippetIdSchema } from "@/server/validations";
@@ -38,6 +39,8 @@ export async function createShareLink(
   expiry: unknown,
 ): Promise<{ token: string; expiresAt: string | null }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
   const days = shareExpirySchema.parse(expiry);
 
@@ -59,6 +62,8 @@ export async function createShareLink(
 
 export async function revokeShareLinks(id: unknown): Promise<{ ok: true }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
 
   await requireOwnedSnippet(snippetId, actor.id);

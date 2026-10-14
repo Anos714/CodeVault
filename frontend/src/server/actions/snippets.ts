@@ -17,6 +17,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq, sql } from "drizzle-orm";
 
 import { auth } from "@/server/auth";
+import { checkLimit } from "@/server/ratelimit";
 import { db } from "@/server/db";
 import { favorites, snippetTags, snippets, user } from "@/server/db/schema";
 import {
@@ -45,6 +46,8 @@ function revalidateVault(id?: string) {
 
 export async function createSnippet(input: unknown): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const data = createSnippetSchema.parse(input);
 
   const [row] = await db
@@ -81,6 +84,8 @@ export async function updateSnippet(
   input: unknown,
 ): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
   const data = updateSnippetSchema.parse(input);
 
@@ -133,6 +138,8 @@ export async function updateSnippet(
 
 export async function deleteSnippet(id: unknown): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
 
   const [row] = await db
@@ -153,6 +160,8 @@ export async function toggleFavorite(
   id: unknown,
 ): Promise<{ favorited: boolean }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
 
   const [target] = await db
@@ -206,6 +215,8 @@ export async function toggleFavorite(
 
 export async function forkSnippet(id: unknown): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
 
   const [original] = await db
@@ -264,6 +275,8 @@ export async function forkSnippet(id: unknown): Promise<{ id: string }> {
 
 export async function incrementCopies(id: unknown): Promise<{ ok: true }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const snippetId = snippetIdSchema.parse(id);
 
   const [target] = await db

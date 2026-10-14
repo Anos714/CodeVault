@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import { LANGUAGE_META } from "@/lib/languages";
 import { getPublicSnippetById, resolveShareToken } from "@/server/queries";
+import { checkLimit, clientIp } from "@/server/ratelimit";
 
 export const runtime = "edge";
 
@@ -14,6 +15,13 @@ export async function GET(
   request: NextRequest,
   context: { params: Promise<{ token: string }> },
 ) {
+  const { ok } = await checkLimit("share-read", clientIp(request.headers));
+  if (!ok) {
+    return new Response("Too many requests — try again in a minute.", {
+      status: 429,
+    });
+  }
+
   const { token } = await context.params;
 
   // same resolution as the share page: usable link first, then a public id.
