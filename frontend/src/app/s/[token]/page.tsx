@@ -5,10 +5,10 @@ import { FileCode2, Globe, Lock } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { LANGUAGE_META } from "@/lib/languages";
 import { highlightToHtml } from "@/lib/highlight";
-import { useSnippetStore } from "@/store/snippet.store";
 import type { Snippet } from "@/lib/snippet-types";
-import { expiryLabel, resolveSnippetByShareToken } from "@/lib/share";
+import { expiryLabel } from "@/lib/share";
 import { CopyCodeButton } from "@/components/dashboard/copy-code-button";
+import { getPublicSnippetById, resolveShareToken } from "@/server/queries";
 
 export const metadata: Metadata = {
   title: "Shared snippet",
@@ -24,15 +24,14 @@ export default async function SharePage({ params }: SharePageProps) {
 
   // a share token resolves to an unlisted link first, then falls back to a
   // public snippet's id — public ones are reachable directly
-  const all = useSnippetStore.getState().snippets;
+  const resolved = await resolveShareToken(token, null);
   const snippet =
-    resolveSnippetByShareToken(all, token) ??
-    all.find((item) => item.id === token && item.visibility === "public");
+    resolved?.snippet ?? (await getPublicSnippetById(token, null));
 
   if (!snippet) notFound();
 
-  const isUnlisted = !snippet.shareLinks?.some((link) => link.token === token);
-  const activeLink = snippet.shareLinks?.find((link) => link.token === token);
+  const isUnlisted = resolved !== null;
+  const activeLink = resolved?.link ?? null;
   const meta = LANGUAGE_META[snippet.language];
 
   return (
