@@ -20,7 +20,7 @@ import {
   snippets,
   user,
 } from "../src/server/db/schema";
-import { seedSnippets } from "../src/lib/snippet-data";
+import { seedSnippets } from "../src/lib/seed-data";
 
 /**
  * The demo account is a real Better Auth credential account: the demo route

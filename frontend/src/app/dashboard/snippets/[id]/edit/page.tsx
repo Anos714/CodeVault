@@ -9,7 +9,7 @@ import { CodeEditor } from "@/components/dashboard/code-editor";
 import { Button } from "@/components/ui/button";
 import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGES, LANGUAGE_META } from "@/lib/languages";
-import type { Visibility } from "@/lib/snippet-data";
+import type { Visibility } from "@/lib/snippet-types";
 import { cn } from "@/lib/utils";
 
 const MAX_TAGS = 5;

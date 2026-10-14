@@ -7,7 +7,7 @@ import { Check, Copy, Globe, Lock, Star, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ForkButton } from "@/components/dashboard/fork-button";
 import { LANGUAGE_META } from "@/lib/languages";
-import type { Snippet } from "@/lib/snippet-data";
+import type { Snippet } from "@/lib/snippet-types";
 import { useSnippetStore } from "@/store/snippet.store";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";

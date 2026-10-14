@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { LANGUAGE_META } from "@/lib/languages";
 import { highlightToHtml } from "@/lib/highlight";
 import { useSnippetStore } from "@/store/snippet.store";
-import { seedSnippets } from "@/lib/snippet-data";
+import { seedSnippets } from "@/lib/seed-data";
 import { CopyCodeButton } from "@/components/dashboard/copy-code-button";
 
 /**

@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { Snippet, Visibility, ShareLink } from "@/lib/snippet-data";
-import { seedSnippets } from "@/lib/snippet-data";
+import type { Snippet, Visibility, ShareLink } from "@/lib/snippet-types";
+import { seedSnippets } from "@/lib/seed-data";
 import type { Language } from "@/lib/languages";
 import { mintShareLink, type ShareExpiryDays } from "@/lib/share";
 

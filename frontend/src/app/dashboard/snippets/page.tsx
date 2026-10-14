@@ -12,7 +12,7 @@ import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-import type { Visibility } from "@/lib/snippet-data";
+import type { Visibility } from "@/lib/snippet-types";
 
 type SortKey = "updated" | "created" | "copies" | "favorites";
 

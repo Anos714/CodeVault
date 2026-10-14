@@ -23,7 +23,7 @@ import {
 } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { easeOutExpo } from "@/lib/motion";
-import type { Snippet } from "@/lib/snippet-data";
+import type { Snippet } from "@/lib/snippet-types";
 
 type ShareDialogProps = {
   snippet: Snippet;

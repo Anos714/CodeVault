@@ -6,7 +6,7 @@ import { Logo } from "@/components/brand/logo";
 import { LANGUAGE_META } from "@/lib/languages";
 import { highlightToHtml } from "@/lib/highlight";
 import { useSnippetStore } from "@/store/snippet.store";
-import type { Snippet } from "@/lib/snippet-data";
+import type { Snippet } from "@/lib/snippet-types";
 import { expiryLabel, resolveSnippetByShareToken } from "@/lib/share";
 import { CopyCodeButton } from "@/components/dashboard/copy-code-button";
 

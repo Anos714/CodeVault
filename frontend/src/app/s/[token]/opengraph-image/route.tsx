@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
-import { seedSnippets } from "@/lib/snippet-data";
+import { seedSnippets } from "@/lib/seed-data";
 import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGE_META } from "@/lib/languages";
 

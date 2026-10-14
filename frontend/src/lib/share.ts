@@ -1,4 +1,4 @@
-import type { ShareLink, Snippet } from "@/lib/snippet-data";
+import type { ShareLink, Snippet } from "@/lib/snippet-types";
 
 export const SHARE_EXPIRY_OPTIONS = [
   { label: "Never", value: null },

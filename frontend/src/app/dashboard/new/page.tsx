@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGES, LANGUAGE_META } from "@/lib/languages";
-import type { Visibility } from "@/lib/snippet-data";
+import type { Visibility } from "@/lib/snippet-types";
 import type { SnippetTemplate } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 import { easeOutExpo } from "@/lib/motion";
