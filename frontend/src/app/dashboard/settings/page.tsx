@@ -15,9 +15,8 @@ import {
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
+import { signOut, updateUser, useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
-import { clearPersistedSession } from "@/components/providers/session-provider";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -33,27 +32,37 @@ function initials(name: string) {
 
 export default function SettingsPage() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const signOut = useAuthStore((state) => state.signOut);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const snippets = useSnippetStore((state) => state.snippets);
 
   const [name, setName] = useState(user?.name ?? "");
   const [email] = useState(user?.email ?? "");
-  const [defaultPrivate, setDefaultPrivate] = useState(true);
+  const [defaultPrivate, setDefaultPrivate] = useState(
+    user?.defaultPrivate ?? true,
+  );
   const [saved, setSaved] = useState(false);
+  const [privacySaved, setPrivacySaved] = useState(false);
 
   const mine = snippets.filter((snippet) => snippet.authorId === user?.id);
 
-  const handleSave = (event: React.FormEvent) => {
+  const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (user) useAuthStore.setState({ user: { ...user, name: name.trim() } });
+    await updateUser({ name: name.trim() });
     setSaved(true);
     setTimeout(() => setSaved(false), 1800);
   };
 
-  const handleSignOut = () => {
-    clearPersistedSession();
-    signOut();
+  // the privacy toggle is independent of the profile form — it saves on flip
+  const handleDefaultPrivate = async (value: boolean) => {
+    setDefaultPrivate(value);
+    await updateUser({ defaultPrivate: value });
+    setPrivacySaved(true);
+    setTimeout(() => setPrivacySaved(false), 1800);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
     router.push("/");
   };
 
@@ -183,6 +192,11 @@ export default function SettingsPage() {
             <span className="flex flex-col gap-1">
               <span className="text-sm font-medium text-foreground">
                 New snippets default to private
+                {privacySaved && (
+                  <span className="ml-2 font-mono text-[0.65rem] text-primary">
+                    saved
+                  </span>
+                )}
               </span>
               <span className="text-sm leading-relaxed text-muted-foreground">
                 Leave it on and you have to flip a snippet to public
@@ -194,7 +208,7 @@ export default function SettingsPage() {
             id="default-private"
             type="checkbox"
             checked={defaultPrivate}
-            onChange={(event) => setDefaultPrivate(event.target.checked)}
+            onChange={(event) => handleDefaultPrivate(event.target.checked)}
             className="sr-only"
           />
         </motion.div>

@@ -15,12 +15,13 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { StatsRow } from "@/components/dashboard/stats-row";
 import { SnippetCard } from "@/components/dashboard/snippet-card";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { staggerContainer } from "@/lib/motion";
 
 export default function OverviewPage() {
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const snippets = useSnippetStore((state) => state.snippets);
 
   const mine = snippets.filter((s) => s.authorId === user?.id);

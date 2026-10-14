@@ -8,7 +8,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { CodeEditor } from "@/components/dashboard/code-editor";
 import { TemplatePicker } from "@/components/dashboard/template-picker";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGES, LANGUAGE_META } from "@/lib/languages";
 import type { Visibility } from "@/lib/snippet-data";
@@ -20,7 +20,8 @@ const MAX_TAGS = 5;
 
 export default function NewSnippetPage() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const addSnippet = useSnippetStore((state) => state.addSnippet);
 
   const [title, setTitle] = useState("");
@@ -85,7 +86,7 @@ export default function NewSnippetPage() {
         code,
         visibility,
       },
-      { id: user.id, name: user.name },
+      { id: user.id, name: user.name ?? "developer" },
     );
 
     // let the button's success state flash before routing

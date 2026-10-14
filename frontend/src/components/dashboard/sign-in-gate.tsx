@@ -1,44 +1,38 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { GoogleButton } from "@/components/site/google-button";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/logo";
-import { useAuthStore, type User } from "@/store/auth.store";
-import { persistSession } from "@/components/providers/session-provider";
+import { GoogleButton } from "@/components/site/google-button";
+import { GithubButton } from "@/components/site/github-button";
+import { signIn } from "@/lib/auth-client";
 import { easeOutExpo } from "@/lib/motion";
 
-const emptySubscribe = () => () => {};
-
-const demoUser: User = {
-  id: "user_demo",
-  name: "Rahul Sain",
-  email: "rahul@codevault.dev",
-  image: null,
-};
+type PendingProvider = "google" | "github" | "demo" | null;
 
 export function SignInGate() {
-  // false during SSR + first hydration, true after — keeps the gate itself
-  // free of hydration mismatches while the store resolves.
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
+  const router = useRouter();
+  const [pending, setPending] = useState<PendingProvider>(null);
 
-  const handleDemoSignIn = () => {
-    persistSession(demoUser);
-    useAuthStore.getState().signIn(demoUser);
+  const handleSocial = async (provider: "google" | "github") => {
+    setPending(provider);
+    // hands the browser off to the OAuth provider; Better Auth redirects
+    // back to the dashboard once the flow completes
+    await signIn.social({ provider, callbackURL: "/dashboard" });
   };
 
-  const handleGoogleSignIn = () => {
-    // OAuth handler lands with the backend; sign in as the demo user for now
-    persistSession(demoUser);
-    useAuthStore.getState().signIn(demoUser);
+  const handleDemo = async () => {
+    setPending("demo");
+    // the route signs in as the seeded demo user and sets the session cookie
+    await fetch("/api/auth/demo", { method: "POST" });
+    router.refresh();
   };
+
+  const busy = pending !== null;
 
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden px-5 py-16">
@@ -48,7 +42,7 @@ export function SignInGate() {
       </div>
 
       <motion.div
-        initial={mounted ? { opacity: 0, y: 20 } : false}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: easeOutExpo }}
         className="flex w-full max-w-md flex-col items-center gap-7 rounded-2xl border border-border bg-card/60 p-8 backdrop-blur-xl sm:p-10"
@@ -67,7 +61,14 @@ export function SignInGate() {
         </div>
 
         <div className="flex w-full flex-col gap-3">
-          <GoogleButton label="Continue with Google" onClick={handleGoogleSignIn} />
+          <GoogleButton
+            label={pending === "google" ? "Redirecting…" : "Continue with Google"}
+            onClick={() => handleSocial("google")}
+          />
+          <GithubButton
+            label={pending === "github" ? "Redirecting…" : "Continue with GitHub"}
+            onClick={() => handleSocial("github")}
+          />
           <div className="flex items-center gap-3">
             <span className="h-px flex-1 bg-border" />
             <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground/60">
@@ -78,9 +79,14 @@ export function SignInGate() {
           <Button
             variant="outline"
             className="h-11 w-full gap-2 rounded-xl"
-            onClick={handleDemoSignIn}
+            disabled={busy}
+            onClick={handleDemo}
           >
-            <Sparkles className="size-4 text-primary" />
+            {pending === "demo" ? (
+              <Loader2 className="size-4 animate-spin text-primary" />
+            ) : (
+              <Sparkles className="size-4 text-primary" />
+            )}
             Continue with a demo account
           </Button>
         </div>

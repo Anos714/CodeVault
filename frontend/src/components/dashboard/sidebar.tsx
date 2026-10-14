@@ -7,7 +7,7 @@ import { ChevronLeft, X, LogOut, ExternalLink } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { dashboardNav } from "@/lib/dashboard-nav";
-import { useAuthStore } from "@/store/auth.store";
+import { signOut } from "@/lib/auth-client";
 import { useUIStore } from "@/store/ui.store";
 import { cn } from "@/lib/utils";
 import { easeOutExpo } from "@/lib/motion";
@@ -15,6 +15,17 @@ import { easeOutExpo } from "@/lib/motion";
 type SidebarProps = {
   /** mobile drawer variant — slides over content with a scrim */
   variant?: "rail" | "drawer";
+  /** signed-in user, resolved server-side by the dashboard layout */
+  user?: {
+    name: string | null;
+    email: string | null;
+    image?: string | null;
+  };
+};
+
+type SidebarFooterProps = {
+  user?: SidebarProps["user"];
+  collapsed: boolean;
 };
 
 function initials(name: string) {
@@ -91,10 +102,7 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-function SidebarFooter({ collapsed }: { collapsed: boolean }) {
-  const user = useAuthStore((state) => state.user);
-  const signOut = useAuthStore((state) => state.signOut);
-
+function SidebarFooter({ user, collapsed }: SidebarFooterProps) {
   if (!user) return null;
 
   return (
@@ -109,12 +117,12 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={user.image}
-            alt={user.name}
+            alt={user.name ?? "user"}
             className="size-8 shrink-0 rounded-full object-cover"
           />
         ) : (
           <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 font-mono text-xs font-semibold text-primary">
-            {initials(user.name)}
+            {initials(user.name ?? "developer")}
           </span>
         )}
         <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
@@ -134,7 +142,13 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
           "h-8 w-full gap-2 rounded-lg text-muted-foreground hover:text-foreground",
           collapsed && "px-0",
         )}
-        onClick={signOut}
+        onClick={async () => {
+          await signOut();
+          // hard navigation on purpose: drops every client cache and store
+          // along with the session cookie
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          window.location.href = "/";
+        }}
         title={collapsed ? "Sign out" : undefined}
       >
         <LogOut className="size-4" />
@@ -144,7 +158,7 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
   );
 }
 
-export function Sidebar({ variant = "rail" }: SidebarProps) {
+export function Sidebar({ variant = "rail", user }: SidebarProps) {
   const collapsed = useUIStore((state) => state.isSidebarCollapsed);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
   const isOpen = useUIStore((state) => state.isSidebarOpen);
@@ -184,7 +198,7 @@ export function Sidebar({ variant = "rail" }: SidebarProps) {
                 </button>
               </div>
               <SidebarNav collapsed={false} />
-              <SidebarFooter collapsed={false} />
+              <SidebarFooter user={user} collapsed={false} />
             </motion.aside>
           </>
         )}
@@ -227,7 +241,7 @@ export function Sidebar({ variant = "rail" }: SidebarProps) {
       </div>
 
       <SidebarNav collapsed={collapsed} />
-      <SidebarFooter collapsed={collapsed} />
+      <SidebarFooter user={user} collapsed={collapsed} />
 
       <div
         className={cn(

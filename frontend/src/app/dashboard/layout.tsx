@@ -1,46 +1,26 @@
-"use client";
+import { headers } from "next/headers";
 
-import { useAuthStore } from "@/store/auth.store";
-import { SessionProvider } from "@/components/providers/session-provider";
+import { Topbar } from "@/components/dashboard/topbar";
 import { SignInGate } from "@/components/dashboard/sign-in-gate";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import { Topbar } from "@/components/dashboard/topbar";
+import { auth } from "@/server/auth";
 
-export default function DashboardLayout({
+/**
+ * Server-side gate: no session, no shell. The Proxy redirects most
+ * unauthenticated traffic before it gets here — this is the check that
+ * actually validates the cookie against the database.
+ */
+export default async function DashboardLayout({
   children,
 }: LayoutProps<"/dashboard">) {
-  return (
-    <SessionProvider>
-      <DashboardShell>{children}</DashboardShell>
-    </SessionProvider>
-  );
-}
+  const session = await auth.api.getSession({ headers: await headers() });
 
-function DashboardShell({ children }: { children: React.ReactNode }) {
-  const user = useAuthStore((state) => state.user);
-  const loading = useAuthStore((state) => state.loading);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="size-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-          <p className="font-mono text-xs text-muted-foreground">
-            Opening your vault…
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <SignInGate />;
-  }
+  if (!session) return <SignInGate />;
 
   return (
     <div className="flex min-h-dvh w-full">
-      <Sidebar variant="rail" />
-      <Sidebar variant="drawer" />
+      <Sidebar variant="rail" user={session.user} />
+      <Sidebar variant="drawer" user={session.user} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />

@@ -6,13 +6,14 @@ import { motion } from "motion/react";
 import { Hash, Sparkles } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/auth.store";
+import { useSession } from "@/lib/auth-client";
 import { useSnippetStore } from "@/store/snippet.store";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { LANGUAGE_META } from "@/lib/languages";
 
 export default function TagsPage() {
-  const user = useAuthStore((state) => state.user);
+  const { data: session } = useSession();
+  const user = session?.user ?? null;
   const snippets = useSnippetStore((state) => state.snippets);
 
   const tags = useMemo(() => {
