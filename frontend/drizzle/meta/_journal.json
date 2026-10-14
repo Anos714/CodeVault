@@ -15,6 +15,20 @@
       "when": 1791982590161,
       "tag": "0001_smooth_joshua_kane",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791983124691,
+      "tag": "0002_known_luminals",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791983162171,
+      "tag": "0003_hard_hellion",
+      "breakpoints": true
     }
   ]
 }
