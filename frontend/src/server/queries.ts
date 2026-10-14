@@ -130,6 +130,30 @@ function safePattern(q: string): string | null {
   return cleaned ? `%${cleaned}%` : null;
 }
 
+/**
+ * Full-text query for ranked search, or null when the input has no searchable
+ * words (symbols only — a tsquery over it would match nothing, so callers
+ * fall back to plain ILIKE instead of returning an empty page).
+ */
+function tsQuery(q: string): SQL | null {
+  const text = q.replace(/[%_\\]/g, "").trim();
+  if (!/[a-z0-9]/i.test(text)) return null;
+  return sql`websearch_to_tsquery('english', ${text})`;
+}
+
+function tsMatch(tsq: SQL): SQL {
+  return sql`${snippets.search} @@ ${tsq}`;
+}
+
+/**
+ * Relevance rounded to 6 decimals as exact numeric. ts_rank returns float4,
+ * whose decimal expansion never round-trips through JSON identically — an
+ * unrounded rank in the cursor would silently match nothing on page 2.
+ */
+function tsRank(tsq: SQL): SQL {
+  return sql`round(ts_rank(${snippets.search}, ${tsq})::numeric, 6)`;
+}
+
 export type VaultSort = "updated" | "created" | "copies" | "favorites";
 
 export type VaultFilters = {
@@ -168,7 +192,13 @@ export type Page = {
 };
 
 /** Opaque page position: primary sort value, optional secondary, row id. */
-export type Cursor = { v: string | number; u?: string; id: string };
+export type Cursor = {
+  v: string | number;
+  u?: string;
+  id: string;
+  /** "rank" cursors page relevance-ordered searches; absent means keyset */
+  k?: string;
+};
 
 function encodeCursor(cursor: Cursor): string {
   return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
@@ -181,11 +211,12 @@ function decodeCursor(raw: string | null | undefined): Cursor | null {
       Buffer.from(raw, "base64url").toString("utf8"),
     );
     if (typeof parsed !== "object" || parsed === null) return null;
-    const { v, u, id } = parsed as Record<string, unknown>;
+    const { v, u, id, k } = parsed as Record<string, unknown>;
     if (typeof id !== "string") return null;
     if (typeof v !== "string" && typeof v !== "number") return null;
     if (u !== undefined && typeof u !== "string") return null;
-    return { v, u, id };
+    if (k !== undefined && typeof k !== "string") return null;
+    return { v, u, id, k };
   } catch {
     return null;
   }
@@ -272,9 +303,13 @@ export async function listOwnSnippets(
   }
 
   const pattern = safePattern(q);
-  if (pattern) {
-    conditions.push(
-      or(
+  const tsq = tsQuery(q);
+  if (pattern || tsq) {
+    // ranked full-text first for recall *and* relevance, ILIKE kept as the
+    // safety net (stopword-only input, fresh rows mid-trigger, odd tokens)
+    const fallbacks: (SQL | undefined)[] = [];
+    if (pattern) {
+      fallbacks.push(
         ilike(snippets.title, pattern),
         ilike(snippets.description, pattern),
         ilike(snippets.language, pattern),
@@ -285,7 +320,10 @@ export async function listOwnSnippets(
             .from(snippetTags)
             .where(ilike(snippetTags.tag, pattern)),
         ),
-      ),
+      );
+    }
+    conditions.push(
+      tsq ? or(tsMatch(tsq), ...fallbacks) : or(...fallbacks),
     );
   }
 
@@ -470,9 +508,11 @@ export async function exploreSnippets(opts: {
   }
 
   const pattern = safePattern(q);
-  if (pattern) {
-    conditions.push(
-      or(
+  const tsq = tsQuery(q);
+  if (pattern || tsq) {
+    const fallbacks: (SQL | undefined)[] = [];
+    if (pattern) {
+      fallbacks.push(
         ilike(snippets.title, pattern),
         ilike(snippets.description, pattern),
         ilike(snippets.language, pattern),
@@ -491,13 +531,31 @@ export async function exploreSnippets(opts: {
             .innerJoin(user, eq(snippets.authorId, user.id))
             .where(ilike(user.name, pattern)),
         ),
-      ),
+      );
+    }
+    conditions.push(
+      tsq ? or(tsMatch(tsq), ...fallbacks) : or(...fallbacks),
     );
   }
 
-  // keyset over (favorites DESC, updated_at DESC, id ASC)
+  // keyset over (favorites DESC, updated_at DESC, id ASC) — or over
+  // (ts_rank DESC, id ASC) when a text query ranks the feed. A cursor from
+  // one ordering never applies to the other; the UI remounts (fresh cursor)
+  // whenever q changes, so a mismatch can only come from a hand-made URL.
   const cursor = decodeCursor(opts.cursor);
-  if (cursor && typeof cursor.v === "number" && cursor.u) {
+  if (tsq) {
+    // ranked searches page by (rank, id) — a feed-style cursor belongs to a
+    // different ordering and is ignored (the UI remounts on q change anyway)
+    if (cursor?.k === "rank" && typeof cursor.v === "number") {
+      const r = cursor.v;
+      const cid = cursor.id;
+      const rankExpr = tsRank(tsq);
+      conditions.push(sql`(
+        ${rankExpr} < ${r} OR
+        (${rankExpr} = ${r} AND ${snippets.id} > ${cid})
+      )`);
+    }
+  } else if (cursor && typeof cursor.v === "number" && cursor.u) {
     const at = new Date(cursor.u);
     if (!Number.isNaN(at.getTime())) {
       const f = cursor.v;
@@ -510,11 +568,21 @@ export async function exploreSnippets(opts: {
     }
   }
 
+  const rankSelect = tsq
+    ? tsRank(tsq).mapWith(Number)
+    : sql`0`.mapWith(Number);
   const rows = await db
-    .select({ snippets })
+    .select({ snippets, rank: rankSelect })
     .from(snippets)
     .where(and(...conditions))
-    .orderBy(desc(snippets.favorites), desc(snippets.updatedAt), snippets.id)
+    .orderBy(
+      // a text query ranks by relevance (ties break by id, matching the
+      // rank cursor predicate exactly); the bare feed stays favorites-first
+      ...(tsq ? [sql`${tsRank(tsq)} desc`, snippets.id] : []),
+      ...(!tsq
+        ? [desc(snippets.favorites), desc(snippets.updatedAt), snippets.id]
+        : []),
+    )
     .limit(limit + 1);
 
   let nextCursor: string | null = null;
@@ -522,7 +590,10 @@ export async function exploreSnippets(opts: {
   if (pageRows.length > limit) {
     pageRows = pageRows.slice(0, limit);
     const last = pageRows[pageRows.length - 1];
-    if (last) {
+    const lastRank = rows[pageRows.length - 1]?.rank;
+    if (last && tsq && typeof lastRank === "number") {
+      nextCursor = encodeCursor({ v: lastRank, id: last.id, k: "rank" });
+    } else if (last) {
       nextCursor = encodeCursor({
         v: last.favorites,
         u: last.updatedAt.toISOString(),

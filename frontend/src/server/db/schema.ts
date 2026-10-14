@@ -14,6 +14,7 @@
 
 import {
   boolean,
+  customType,
   index,
   integer,
   pgTable,
@@ -21,6 +22,18 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+
+/**
+ * Postgres full-text vector, maintained by triggers (see the migration that
+ * adds it): title + description + language + the snippet's tags, english
+ * config. Declared here so drizzle-kit owns the column and the GIN index;
+ * the triggers live as raw SQL appended to that migration.
+ */
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 /* ------------------------------------------------------------------ *
  * Better Auth tables
@@ -106,6 +119,8 @@ export const snippets = pgTable(
     /** fork credit survives deletion of the original snippet */
     forkedFromId: text("forked_from_id"),
     forkedFromAuthor: text("forked_from_author"),
+    /** full-text vector for ranked search — trigger-maintained, see migration */
+    search: tsvector("search"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -118,6 +133,7 @@ export const snippets = pgTable(
     index("snippets_updated_at_idx").on(t.updatedAt),
     index("snippets_visibility_idx").on(t.visibility),
     index("snippets_language_idx").on(t.language),
+    index("snippets_search_gin_idx").using("gin", t.search),
   ],
 );
 
