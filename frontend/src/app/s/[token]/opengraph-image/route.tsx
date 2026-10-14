@@ -1,8 +1,7 @@
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
-import { seedSnippets } from "@/lib/snippet-data";
-import { useSnippetStore } from "@/store/snippet.store";
 import { LANGUAGE_META } from "@/lib/languages";
+import { getPublicSnippetById, resolveShareToken } from "@/server/queries";
 
 export const runtime = "edge";
 
@@ -17,9 +16,12 @@ export async function GET(
 ) {
   const { token } = await context.params;
 
+  // same resolution as the share page: usable link first, then a public id.
+  // The old code compared the token against snippet ids, so every unlisted
+  // link rendered a 404 card here.
+  const resolved = await resolveShareToken(token, null);
   const snippet =
-    seedSnippets.find((item) => item.id === token) ??
-    useSnippetStore.getState().snippets.find((item) => item.id === token);
+    resolved?.snippet ?? (await getPublicSnippetById(token, null));
 
   if (!snippet) {
     return new Response("Not found", { status: 404 });

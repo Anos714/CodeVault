@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Check, GitFork } from "lucide-react";
-import { useSnippetStore } from "@/store/snippet.store";
 import { useSession } from "@/lib/auth-client";
+import { forkSnippet } from "@/server/actions/snippets";
 import { cn } from "@/lib/utils";
 
 type ForkButtonProps = {
   snippetId: string;
+  authorId: string;
   className?: string;
   /** inline variant for cards, outlined for the detail toolbar */
   variant?: "ghost" | "outline";
@@ -22,29 +23,27 @@ type ForkButtonProps = {
  */
 export function ForkButton({
   snippetId,
+  authorId,
   className,
   variant = "ghost",
   label = "Fork",
 }: ForkButtonProps) {
   const router = useRouter();
-  const forkSnippet = useSnippetStore((state) => state.forkSnippet);
   const { data: session } = useSession();
   const user = session?.user ?? null;
-  const snippets = useSnippetStore((state) => state.snippets);
   const [forked, setForked] = useState(false);
 
-  const snippet = snippets.find((item) => item.id === snippetId);
-  if (!snippet || snippet.authorId === user?.id) return null;
+  if (!authorId || authorId === user?.id) return null;
 
-  const handleFork = () => {
+  const handleFork = async () => {
     if (!user) return;
-    const fork = forkSnippet(snippetId, {
-      id: user.id,
-      name: user.name ?? "developer",
-    });
-    if (!fork) return;
-    setForked(true);
-    setTimeout(() => router.push(`/dashboard/snippets/${fork.id}`), 500);
+    try {
+      const fork = await forkSnippet(snippetId);
+      setForked(true);
+      setTimeout(() => router.push(`/dashboard/snippets/${fork.id}`), 500);
+    } catch {
+      /* not viewable or gone — stay put */
+    }
   };
 
   return (

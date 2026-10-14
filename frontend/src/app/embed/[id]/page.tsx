@@ -1,15 +1,19 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { LANGUAGE_META } from "@/lib/languages";
 import { highlightToHtml } from "@/lib/highlight";
-import { useSnippetStore } from "@/store/snippet.store";
-import { seedSnippets } from "@/lib/snippet-data";
 import { CopyCodeButton } from "@/components/dashboard/copy-code-button";
+import { auth } from "@/server/auth";
+import { getEmbedSnippet } from "@/server/queries";
 
 /**
  * Chrome-free embed surface for READMEs and Notion. Drop
  * `<iframe src="/embed/[id]" height="N" width="100%"></iframe>` into a doc and
  * the snippet renders highlighted, titled, and copyable — a lightweight Gist.
+ *
+ * Public snippets open for everyone; private ones only for the owner — a
+ * private id in an iframe URL must not leak code.
  */
 type EmbedPageProps = {
   params: Promise<{ id: string }>;
@@ -17,10 +21,9 @@ type EmbedPageProps = {
 
 export default async function EmbedPage({ params }: EmbedPageProps) {
   const { id } = await params;
+  const session = await auth.api.getSession({ headers: await headers() });
 
-  const snippet =
-    seedSnippets.find((item) => item.id === id) ??
-    useSnippetStore.getState().snippets.find((item) => item.id === id);
+  const snippet = await getEmbedSnippet(id, session?.user.id ?? null);
 
   if (!snippet) notFound();
 

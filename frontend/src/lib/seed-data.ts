@@ -1,39 +1,13 @@
-import type { Language } from "@/lib/languages";
+/**
+ * Demo seed rows — the pre-DAL vault.
+ *
+ * Feeds `scripts/seed.ts` (which copies these rows into Neon, so the real
+ * database looks identical to the mock one) and, temporarily, the pages that
+ * still read from the zustand store. Deleted once every page reads from the
+ * DAL (`src/server/queries.ts`).
+ */
 
-export type Visibility = "private" | "public";
-
-export type ShareLink = {
-  /** opaque token in the /s/[token] URL */
-  token: string;
-  /** ISO datestring, or null for a link that never expires */
-  expiresAt: string | null;
-  /** ISO datestring the link was minted */
-  createdAt: string;
-  /** set when the owner revokes the link */
-  revoked: boolean;
-};
-
-export type Snippet = {
-  id: string;
-  title: string;
-  description: string;
-  language: Language;
-  tags: string[];
-  code: string;
-  visibility: Visibility;
-  /** author id — the seed data uses the demo user */
-  authorId: string;
-  authorName: string;
-  favorites: number;
-  copies: number;
-  createdAt: string;
-  updatedAt: string;
-  /** unlisted share links minted from a private snippet */
-  shareLinks?: ShareLink[];
-  /** id of the snippet this one was forked from, if any */
-  forkedFromId?: string;
-  forkedFromAuthor?: string;
-};
+import type { Snippet } from "@/lib/snippet-types";
 
 /**
  * Seed vault for the demo dashboard. The backend API replaces this once the
