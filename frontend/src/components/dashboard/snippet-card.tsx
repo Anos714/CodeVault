@@ -2,13 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Check, Copy, Globe, Lock, Star, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ForkButton } from "@/components/dashboard/fork-button";
 import { LANGUAGE_META } from "@/lib/languages";
-import type { Snippet } from "@/lib/snippet-types";
-import { useSnippetStore } from "@/store/snippet.store";
+import type { HydratedSnippet } from "@/lib/snippet-types";
+import {
+  incrementCopies,
+  toggleFavorite,
+} from "@/server/actions/snippets";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
 
@@ -31,7 +35,7 @@ function relativeTime(iso: string) {
 }
 
 type SnippetCardProps = {
-  snippet: Snippet;
+  snippet: HydratedSnippet;
   /** show author info — on for the explore feed, off in the personal vault */
   showAuthor?: boolean;
   /** index for the stagger entrance */
@@ -45,21 +49,36 @@ export function SnippetCard({
   index = 0,
   onDelete,
 }: SnippetCardProps) {
-  const favorites = useSnippetStore((state) => state.favorites);
-  const toggleFavorite = useSnippetStore((state) => state.toggleFavorite);
-  const incrementCopies = useSnippetStore((state) => state.incrementCopies);
+  const router = useRouter();
+  // local star state, seeded from the server and confirmed by the action
+  // result — the grid remounts cards when the underlying row changes
+  const [starred, setStarred] = useState(snippet.starred);
+  const [starCount, setStarCount] = useState(snippet.favorites);
   const [copied, setCopied] = useState(false);
 
-  const isFavorite = favorites.includes(snippet.id);
   const meta = LANGUAGE_META[snippet.language];
   const preview = snippet.code.split("\n").slice(0, MAX_PREVIEW_LINES);
   const truncated = snippet.code.split("\n").length > MAX_PREVIEW_LINES;
+
+  const handleToggleFavorite = async () => {
+    const previous = starred;
+    setStarred(!previous);
+    setStarCount((count) => (previous ? Math.max(0, count - 1) : count + 1));
+    try {
+      const result = await toggleFavorite(snippet.id);
+      setStarred(result.favorited);
+      router.refresh();
+    } catch {
+      setStarred(previous);
+      setStarCount(snippet.favorites);
+    }
+  };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(snippet.code);
       setCopied(true);
-      incrementCopies(snippet.id);
+      await incrementCopies(snippet.id);
       setTimeout(() => setCopied(false), 1600);
     } catch {
       /* clipboard unavailable */
@@ -110,12 +129,12 @@ export function SnippetCard({
           </Link>
           <button
             type="button"
-            onClick={() => toggleFavorite(snippet.id)}
-            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-            aria-pressed={isFavorite}
+            onClick={handleToggleFavorite}
+            aria-label={starred ? "Remove from favorites" : "Add to favorites"}
+            aria-pressed={starred}
             className={cn(
               "inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 transition-colors",
-              isFavorite
+              starred
                 ? "text-syntax-number"
                 : "text-muted-foreground hover:text-foreground",
             )}
@@ -123,7 +142,7 @@ export function SnippetCard({
             <Star
               className="size-4"
               strokeWidth={1.75}
-              fill={isFavorite ? "currentColor" : "none"}
+              fill={starred ? "currentColor" : "none"}
             />
           </button>
         </div>
@@ -168,7 +187,7 @@ export function SnippetCard({
           </span>
           <span className="inline-flex items-center gap-1">
             <Star className="size-3" fill="currentColor" strokeWidth={0} />
-            {snippet.favorites}
+            {starCount}
           </span>
           <button
             type="button"
@@ -183,7 +202,7 @@ export function SnippetCard({
             )}
             {copied ? "Copied" : "Copy"}
           </button>
-          <ForkButton snippetId={snippet.id} label="Fork" />
+          <ForkButton snippetId={snippet.id} authorId={snippet.authorId} label="Fork" />
           {onDelete && (
             <button
               type="button"

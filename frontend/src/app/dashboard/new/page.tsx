@@ -9,8 +9,8 @@ import { CodeEditor } from "@/components/dashboard/code-editor";
 import { TemplatePicker } from "@/components/dashboard/template-picker";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/auth-client";
-import { useSnippetStore } from "@/store/snippet.store";
-import { LANGUAGES, LANGUAGE_META } from "@/lib/languages";
+import { createSnippet } from "@/server/actions/snippets";
+import { LANGUAGES, LANGUAGE_META, isLanguage } from "@/lib/languages";
 import type { Visibility } from "@/lib/snippet-types";
 import type { SnippetTemplate } from "@/lib/templates";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,6 @@ export default function NewSnippetPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user ?? null;
-  const addSnippet = useSnippetStore((state) => state.addSnippet);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -68,29 +67,25 @@ export default function NewSnippetPage() {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate() || !user) return;
 
     setSubmitting(true);
-    const languageMeta = LANGUAGE_META;
-    const snippet = addSnippet(
-      {
+    try {
+      const { id } = await createSnippet({
         title: title.trim(),
         description: description.trim(),
-        language:
-          languageMeta[language as keyof typeof languageMeta] !== undefined
-            ? (language as never)
-            : "typescript",
+        language: isLanguage(language) ? language : "typescript",
         tags,
         code,
         visibility,
-      },
-      { id: user.id, name: user.name ?? "developer" },
-    );
-
-    // let the button's success state flash before routing
-    setTimeout(() => router.push(`/dashboard/snippets/${snippet.id}`), 350);
+      });
+      // let the button's success state flash before routing
+      setTimeout(() => router.push(`/dashboard/snippets/${id}`), 350);
+    } catch {
+      setSubmitting(false);
+    }
   };
 
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Check,
@@ -14,7 +15,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useSnippetStore } from "@/store/snippet.store";
+import {
+  createShareLink,
+  revokeShareLinks,
+} from "@/server/actions/share";
 import {
   SHARE_EXPIRY_OPTIONS,
   shareUrl,
@@ -32,23 +36,23 @@ type ShareDialogProps = {
 };
 
 export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
-  const createShareLink = useSnippetStore((state) => state.createShareLink);
-  const revokeShareLinks = useSnippetStore((state) => state.revokeShareLinks);
-  const snippets = useSnippetStore((state) => state.snippets);
+  const router = useRouter();
 
-  // read live share-link state from the store so mint/revoke show instantly
-  const current = snippets.find((item) => item.id === snippet.id) ?? snippet;
-  const links = current.shareLinks ?? [];
+  // links arrive as server props and refresh with the route after mint/revoke
+  const links = snippet.shareLinks ?? [];
 
   const [expiry, setExpiry] = useState<ShareExpiryDays>(null);
   const [justMinted, setJustMinted] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const handleMint = () => {
-    const link = createShareLink(snippet.id, expiry);
-    if (link) {
+  const handleMint = async () => {
+    try {
+      const link = await createShareLink(snippet.id, expiry);
       setJustMinted(link.token);
       setCopied(null);
+      router.refresh();
+    } catch {
+      /* not the owner, or gone — stay put */
     }
   };
 
@@ -62,9 +66,14 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
     }
   };
 
-  const handleRevoke = () => {
-    revokeShareLinks(snippet.id);
-    setJustMinted(null);
+  const handleRevoke = async () => {
+    try {
+      await revokeShareLinks(snippet.id);
+      setJustMinted(null);
+      router.refresh();
+    } catch {
+      /* not the owner, or gone — stay put */
+    }
   };
 
   return (
