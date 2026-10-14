@@ -17,7 +17,6 @@ test.describe("collections", () => {
     await page.getByLabel("Collection name").fill(name);
     await page.getByRole("button", { name: /New collection/ }).click();
     await page.waitForURL(/\/dashboard\/collections\/col_/, { timeout: 20_000 });
-    const detailUrl = page.url();
     await expect(page.getByRole("heading", { name })).toBeVisible();
 
     // rename + describe

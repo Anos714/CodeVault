@@ -14,6 +14,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 
 import { auth } from "@/server/auth";
+import { checkLimit } from "@/server/ratelimit";
 import { db } from "@/server/db";
 import {
   collectionLinks,
@@ -63,6 +64,8 @@ export async function createCollection(
   input: unknown,
 ): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const data = createCollectionSchema.parse(input);
 
   const [row] = await db
@@ -85,6 +88,8 @@ export async function updateCollection(
   input: unknown,
 ): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const collectionId = collectionIdSchema.parse(id);
   const data = updateCollectionSchema.parse(input);
 
@@ -108,6 +113,8 @@ export async function deleteCollection(
   id: unknown,
 ): Promise<{ id: string }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const collectionId = collectionIdSchema.parse(id);
 
   // members + links cascade in the database
@@ -135,6 +142,8 @@ export async function addSnippetToCollection(
   snippetId: unknown,
 ): Promise<{ ok: true }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const cid = collectionIdSchema.parse(collectionId);
   const sid = snippetIdSchema.parse(snippetId);
 
@@ -172,6 +181,8 @@ export async function removeSnippetFromCollection(
   snippetId: unknown,
 ): Promise<{ ok: true }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const cid = collectionIdSchema.parse(collectionId);
   const sid = snippetIdSchema.parse(snippetId);
 
@@ -203,6 +214,8 @@ export async function createCollectionLink(
   expiry: unknown,
 ): Promise<{ token: string; expiresAt: string | null }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const collectionId = collectionIdSchema.parse(id);
   const days = shareExpirySchema.parse(expiry);
 
@@ -226,6 +239,8 @@ export async function revokeCollectionLinks(
   id: unknown,
 ): Promise<{ ok: true }> {
   const actor = await requireUser();
+  const { ok: allowed } = await checkLimit("write", actor.id);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
   const collectionId = collectionIdSchema.parse(id);
 
   await requireOwnedCollection(collectionId, actor.id);

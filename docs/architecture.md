@@ -179,6 +179,7 @@ reads `session.user.defaultPrivate` on the server and seeds the form with it.
 | Oversized input | Zod caps (code ≤200k) under the 1 MB action body limit; LIKE wildcards stripped from search |
 | Secret exposure | All env read server-side; the browser sees `NEXT_PUBLIC_SITE_URL` and nothing else |
 | Lost favorite/star races | Atomic counters + sequential action dispatch (no client `Promise.all` over actions) |
+| Share/demo abuse | Upstash sliding windows: 30/min demo per IP, 100/min share-reads per IP, 60/min writes per user — Redis down fails open |
 
 ## 9. Performance & shipping details
 

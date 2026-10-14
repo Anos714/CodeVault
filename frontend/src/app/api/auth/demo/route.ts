@@ -10,8 +10,17 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/server/auth";
+import { checkLimit, clientIp } from "@/server/ratelimit";
 
 export async function POST() {
+  const ip = clientIp(await headers());
+  const { ok } = await checkLimit("demo", ip);
+  if (!ok) {
+    return new Response("Too many demo sign-ins — try again in a minute.", {
+      status: 429,
+    });
+  }
+
   const email = process.env.DEMO_EMAIL ?? "demo@codevault.dev";
   const password = process.env.DEMO_PASSWORD ?? "codevault-demo";
 

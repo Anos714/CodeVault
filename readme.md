@@ -118,6 +118,7 @@ All values live in `frontend/.env.local` (gitignored). Full annotated copy in [`
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub sign-in | [Create an OAuth app](https://github.com/settings/developers). Left blank → the provider is skipped. |
 | `DEMO_EMAIL` / `DEMO_PASSWORD` | Demo account | Seeded credential login. Defaults to `demo@codevault.dev` / `codevault-demo`. |
 | `NEXT_PUBLIC_SITE_URL` | Social previews | Optional. Sitemap/OG base; falls back to `BETTER_AUTH_URL`. |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Rate limiting | Optional. Upstash REST creds — absent means limits fail open (everything works, nothing throttled). |
 
 ## Commands
 
@@ -134,6 +135,7 @@ bun run db:migrate   # apply pending migrations (needs DATABASE_URL_UNPOOLED)
 bun run db:push      # push schema directly (dev only)
 bun run db:studio    # Drizzle Studio
 bun run db:seed      # idempotent demo seed
+bun run test:e2e     # Playwright suite (needs dev server + seeded DB)
 ```
 
 ### Database migrations
@@ -237,7 +239,8 @@ Any host that runs `next build` / `next start` works — Vercel is the default. 
 2.  `DATABASE_URL_UNPOOLED` (Neon) — run `bun run db:migrate` then `bun run db:seed` against it once.
 3.  `BETTER_AUTH_SECRET` + `BETTER_AUTH_URL` — sessions.
 4.  `NEXT_PUBLIC_SITE_URL` — correct sitemap and social-share previews.
-5.  One OAuth provider, with its callback URL pointed at `https://<your-domain>/api/auth/callback/<provider>` (Better Auth's default path under its `/api/auth` base path).
+5.  `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` — rate limiting (optional, fails open without).
+6.  One OAuth provider, with its callback URL pointed at `https://<your-domain>/api/auth/callback/<provider>` (Better Auth's default path under its `/api/auth` base path).
 
 Without OAuth keys the app still runs: Google/GitHub buttons are skipped and the demo account carries the whole experience. Without a database the build still passes, but every read fails closed — seed before sharing the URL.
 
@@ -252,11 +255,10 @@ Dark developer canvas with warm syntax accents — near-black surfaces, muted bo
 
 ## Future improvements
 
--   **E2E tests on top of hand-testing.** `typecheck` + `lint` + `build` gate every branch, but the create → share → unlisted-URL loop and the OAuth sign-in flow are still only exercised by hand. Playwright would close that gap.
--   **Pagination.** Lists currently fetch the whole vault in one query with SQL ordering and filtering. Cursor-based pagination on `(updated_at, id)` keeps page 500 as cheap as page 1 once vaults grow.
--   **Full-text search.** Title/description/tag matching is `ILIKE` today. A Postgres `tsvector` column with a GIN index would rank matches instead of just filtering them.
--   **Rate limiting.** Public surfaces (`/s/[token]`, `/embed/[id]`, demo login) have no throttles yet. A sliding window per IP on writes and share reads is the next hardening step.
--   **Collections.** Tags are flat by design, but named collections (folders with their own share links) keep coming up — the `share_links` pattern would extend to them cleanly.
+Shipped since this list was written: Playwright E2E (`bun run test:e2e`, 12 specs), keyset cursor pagination with Load more, stemmed full-text search (`tsvector` + GIN + triggers), Upstash sliding-window rate limits, and collections (folders with unlisted `/c/[token]` links). What's still open:
+
+-   **Tighter image allowlist.** (No remote images yet — nothing to constrain. Revisit when avatars or pasted image URLs land.)
+-   **Scheduled schema drift checks.** A CI check that `bun run db:generate` is clean (no pending diff) would catch schema drift before deploy.
 
 ## License
 

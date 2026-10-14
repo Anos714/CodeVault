@@ -186,4 +186,20 @@ sign-out, `updateUser` for name + `defaultPrivate`) mounted at its default
 | `401` | No session (action throw, demo without seed, CSRF-less POST) |
 | `403` | Private snippet of a stranger (action throw) |
 | `404` | Unknown id/token — pages render the not-found card, OG returns `Not found` |
+| `429` | Rate limit tripped (see below) |
 | `500` | Unexpected; raw detail only in dev |
+
+## Rate limits (`src/server/ratelimit.ts`)
+
+Sliding windows over Upstash Redis (REST, edge-safe). Unconfigured
+credentials or a Redis outage both fail **open** (allowed) — limiting is
+protection, never a dependency.
+
+| Bucket | Window | Identity | Enforced in |
+| ------ | ------ | -------- | ----------- |
+| `demo` | 30/min | IP | `POST /api/auth/demo` → `429` past the budget |
+| `share-read` | 100/min | IP | `proxy.ts` on `/s/*`, `/embed/*`, `/c/*` → `429`; OG route → `429` |
+| `write` | 60/min | user id | every mutating server action → throw past the budget |
+
+Keys are namespaced `codevault:<bucket>` in Redis. The E2E suite signs in
+~10× per run from one IP — comfortably inside the demo budget.
