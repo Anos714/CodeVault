@@ -43,3 +43,23 @@ export type Snippet = {
 export type HydratedSnippet = Snippet & {
   starred: boolean;
 };
+
+/**
+ * A named folder of snippets. Collections are always private; sharing runs
+ * exclusively through unlisted links (collectionLinks), mirroring the
+ * snippet share_links pattern.
+ */
+export type Collection = {
+  id: string;
+  name: string;
+  description: string;
+  authorId: string;
+  authorName: string;
+  snippetCount: number;
+  /** members, newest-added first (owner + link views only) */
+  snippets?: HydratedSnippet[];
+  /** outstanding links (owner view only) */
+  shareLinks?: ShareLink[];
+  createdAt: string;
+  updatedAt: string;
+};

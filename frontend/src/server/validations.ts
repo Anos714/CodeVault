@@ -91,3 +91,24 @@ export const shareExpirySchema = z.union([
 ]);
 
 export type ShareExpiryInput = z.input<typeof shareExpirySchema>;
+
+/** Row id — `col_<uuid>` for collections. */
+export const collectionIdSchema = z.string().trim().min(1).max(128);
+
+export const createCollectionSchema = z.object({
+  name: z.string().trim().min(1, "Give the collection a name.").max(60),
+  description: z.string().trim().max(220).default(""),
+});
+
+export type CreateCollectionData = z.output<typeof createCollectionSchema>;
+
+export const updateCollectionSchema = z
+  .object({
+    name: z.string().trim().min(1).max(60).optional(),
+    description: z.string().trim().max(220).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "Nothing to update.",
+  });
+
+export type UpdateCollectionData = z.output<typeof updateCollectionSchema>;
