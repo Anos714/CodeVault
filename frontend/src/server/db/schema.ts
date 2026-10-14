@@ -192,3 +192,71 @@ export const favorites = pgTable(
     index("favorites_user_id_idx").on(t.userId),
   ],
 );
+
+export const collections = pgTable(
+  "collections",
+  {
+    id: text("id")
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => `col_${crypto.randomUUID()}`),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("collections_author_id_idx").on(t.authorId),
+    index("collections_updated_at_idx").on(t.updatedAt),
+  ],
+);
+
+export const collectionSnippets = pgTable(
+  "collection_snippets",
+  {
+    collectionId: text("collection_id")
+      .notNull()
+      .references(() => collections.id, { onDelete: "cascade" }),
+    snippetId: text("snippet_id")
+      .notNull()
+      .references(() => snippets.id, { onDelete: "cascade" }),
+    addedAt: timestamp("added_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.collectionId, t.snippetId] }),
+    index("collection_snippets_snippet_id_idx").on(t.snippetId),
+  ],
+);
+
+/** Unlisted links for collections — same pattern as snippet share_links. */
+export const collectionLinks = pgTable(
+  "collection_links",
+  {
+    /** 32 hex chars, opaque, unguessable — looked up only by primary key */
+    token: text("token")
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => crypto.randomUUID().replace(/-/g, "")),
+    collectionId: text("collection_id")
+      .notNull()
+      .references(() => collections.id, { onDelete: "cascade" }),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    revoked: boolean("revoked").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("collection_links_collection_id_idx").on(t.collectionId)],
+);

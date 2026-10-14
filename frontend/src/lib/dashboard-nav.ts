@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   FileCode2,
   SquarePen,
+  Folder,
   Tag,
   Globe,
   Settings,
@@ -37,6 +38,12 @@ export const dashboardNav: NavItem[] = [
     href: "/dashboard/new",
     icon: SquarePen,
     matchPrefix: "/dashboard/new",
+  },
+  {
+    label: "Collections",
+    href: "/dashboard/collections",
+    icon: Folder,
+    matchPrefix: "/dashboard/collections",
   },
   {
     label: "Tags",

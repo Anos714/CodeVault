@@ -14,6 +14,9 @@ import { and, desc, eq, ilike, inArray, or, sql, type SQL, type SQLWrapper } fro
 
 import { db } from "@/server/db";
 import {
+  collectionLinks,
+  collectionSnippets,
+  collections,
   favorites,
   shareLinks,
   snippetTags,
@@ -22,6 +25,7 @@ import {
 } from "@/server/db/schema";
 import { isLanguage } from "@/lib/languages";
 import type {
+  Collection,
   HydratedSnippet,
   ShareLink,
   Snippet,
@@ -29,6 +33,7 @@ import type {
 } from "@/lib/snippet-types";
 
 type SnippetRow = typeof snippets.$inferSelect;
+type CollectionRow = typeof collections.$inferSelect;
 
 /* ------------------------------------------------------------------ *
  * hydration — rows in, Snippet shapes out
@@ -670,4 +675,164 @@ export async function getEmbedSnippet(
 
   const [snippet] = await hydrate([row], viewerId);
   return snippet ?? null;
+}
+
+/* ------------------------------------------------------------------ *
+ * collections — folders with their own unlisted links
+ * ------------------------------------------------------------------ */
+
+function toCollection(
+  row: CollectionRow,
+  authorName: string,
+  snippetCount: number,
+): Collection {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    authorId: row.authorId,
+    authorName,
+    snippetCount,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+async function collectionLinksFor(
+  collectionId: string,
+): Promise<ShareLink[]> {
+  const rows = await db
+    .select()
+    .from(collectionLinks)
+    .where(eq(collectionLinks.collectionId, collectionId))
+    .orderBy(collectionLinks.createdAt);
+  return rows.map((row) => ({
+    token: row.token,
+    expiresAt: row.expiresAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
+    revoked: row.revoked,
+  }));
+}
+
+/** Newest members first. Collections open only for the owner or through an
+ *  unlisted link, which authorizes the full member list. */
+async function collectionMembers(
+  collectionId: string,
+  viewerId: string | null,
+): Promise<HydratedSnippet[]> {
+  const rows = await db
+    .select({ snippet: snippets })
+    .from(collectionSnippets)
+    .innerJoin(snippets, eq(collectionSnippets.snippetId, snippets.id))
+    .where(eq(collectionSnippets.collectionId, collectionId))
+    .orderBy(desc(collectionSnippets.addedAt), snippets.id);
+  return hydrate(
+    rows.map((row) => row.snippet),
+    viewerId,
+  );
+}
+
+export async function listCollections(
+  userId: string,
+): Promise<Collection[]> {
+  const rows = await db
+    .select({
+      collection: collections,
+      authorName: user.name,
+      n: sql`count(${collectionSnippets.snippetId})`.mapWith(Number),
+    })
+    .from(collections)
+    .innerJoin(user, eq(collections.authorId, user.id))
+    .leftJoin(
+      collectionSnippets,
+      eq(collections.id, collectionSnippets.collectionId),
+    )
+    .where(eq(collections.authorId, userId))
+    .groupBy(collections.id, user.id, user.name)
+    .orderBy(desc(collections.updatedAt), collections.id);
+
+  return rows.map((row) =>
+    toCollection(row.collection, row.authorName, row.n),
+  );
+}
+
+/** Owner-only management view: full members plus outstanding links. */
+export async function getCollectionById(
+  id: string,
+  viewerId: string | null,
+): Promise<Collection | null> {
+  const [row] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, id))
+    .limit(1);
+  if (!row || row.authorId !== viewerId) return null;
+
+  const [author, members, links] = await Promise.all([
+    db
+      .select({ name: user.name })
+      .from(user)
+      .where(eq(user.id, row.authorId))
+      .limit(1)
+      .then((rows) => rows[0]?.name ?? "unknown"),
+    collectionMembers(id, viewerId),
+    collectionLinksFor(id),
+  ]);
+
+  return {
+    ...toCollection(row, author, members.length),
+    snippets: members,
+    shareLinks: links,
+  };
+}
+
+export type ResolvedCollectionShare = {
+  collection: Collection;
+  link: ShareLink;
+};
+
+/** An unlisted collection link authorizes the full member list. */
+export async function resolveCollectionToken(
+  token: string,
+  viewerId: string | null,
+): Promise<ResolvedCollectionShare | null> {
+  const [linkRow] = await db
+    .select()
+    .from(collectionLinks)
+    .where(eq(collectionLinks.token, token))
+    .limit(1);
+  if (!linkRow || linkRow.revoked) return null;
+  if (linkRow.expiresAt && linkRow.expiresAt.getTime() < Date.now()) {
+    return null;
+  }
+
+  const [row] = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, linkRow.collectionId))
+    .limit(1);
+  if (!row) return null;
+
+  const [author, members] = await Promise.all([
+    db
+      .select({ name: user.name })
+      .from(user)
+      .where(eq(user.id, row.authorId))
+      .limit(1)
+      .then((rows) => rows[0]?.name ?? "unknown"),
+    collectionMembers(row.id, viewerId),
+  ]);
+
+  return {
+    collection: {
+      ...toCollection(row, author, members.length),
+      snippets: members,
+    },
+    link: {
+      token: linkRow.token,
+      expiresAt: linkRow.expiresAt?.toISOString() ?? null,
+      createdAt: linkRow.createdAt.toISOString(),
+      revoked: linkRow.revoked,
+    },
+  };
 }
