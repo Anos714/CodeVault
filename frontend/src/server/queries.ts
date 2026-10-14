@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql, type SQL, type SQLWrapper } from "drizzle-orm";
 
 import { db } from "@/server/db";
 import {
@@ -154,14 +154,104 @@ function sortColumn(sort: VaultSort = "updated") {
 }
 
 /* ------------------------------------------------------------------ *
+ * cursor pagination — opaque, stable under concurrent writes
+ * ------------------------------------------------------------------ */
+
+/** Grid page size shared by the vault list and the explore feed. */
+export const PAGE_SIZE = 12;
+
+export type Page = {
+  /** max rows; clamped to 1–50 */
+  limit?: number;
+  /** opaque cursor from a previous page; null/undefined starts over */
+  cursor?: string | null;
+};
+
+/** Opaque page position: primary sort value, optional secondary, row id. */
+export type Cursor = { v: string | number; u?: string; id: string };
+
+function encodeCursor(cursor: Cursor): string {
+  return Buffer.from(JSON.stringify(cursor), "utf8").toString("base64url");
+}
+
+function decodeCursor(raw: string | null | undefined): Cursor | null {
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(
+      Buffer.from(raw, "base64url").toString("utf8"),
+    );
+    if (typeof parsed !== "object" || parsed === null) return null;
+    const { v, u, id } = parsed as Record<string, unknown>;
+    if (typeof id !== "string") return null;
+    if (typeof v !== "string" && typeof v !== "number") return null;
+    if (u !== undefined && typeof u !== "string") return null;
+    return { v, u, id };
+  } catch {
+    return null;
+  }
+}
+
+function clampLimit(limit?: number): number {
+  if (!limit || !Number.isFinite(limit)) return PAGE_SIZE;
+  return Math.min(50, Math.max(1, Math.floor(limit)));
+}
+
+/**
+ * "Rows after the cursor" for a (column DESC, id ASC) ordering. Keyset, not
+ * offset — inserting a snippet never shifts or duplicates a page.
+ */
+function afterCursor(column: SQLWrapper, cursor: Cursor): SQL {
+  const value =
+    typeof cursor.v === "number" ? cursor.v : new Date(cursor.v);
+  return sql`(${column} < ${value} OR (${column} = ${value} AND ${snippets.id} > ${cursor.id}))`;
+}
+
+function vaultCursorValue(
+  sort: VaultSort,
+  row: SnippetRow,
+): string | number {
+  switch (sort) {
+    case "created":
+      return row.createdAt.toISOString();
+    case "copies":
+      return row.copies;
+    case "favorites":
+      return row.favorites;
+    case "updated":
+    default:
+      return row.updatedAt.toISOString();
+  }
+}
+
+function vaultCursorColumn(sort: VaultSort) {
+  switch (sort) {
+    case "created":
+      return snippets.createdAt;
+    case "copies":
+      return snippets.copies;
+    case "favorites":
+      return snippets.favorites;
+    case "updated":
+    default:
+      return snippets.updatedAt;
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * own vault — list, stats, tags
  * ------------------------------------------------------------------ */
 
 export async function listOwnSnippets(
   userId: string,
   filters: VaultFilters = {},
-): Promise<{ snippets: HydratedSnippet[]; total: number }> {
+  page: Page = {},
+): Promise<{
+  snippets: HydratedSnippet[];
+  total: number;
+  nextCursor: string | null;
+}> {
   const { q = "", tag = "", visibility = "all", sort = "updated" } = filters;
+  const limit = clampLimit(page.limit);
 
   const conditions: (SQL | undefined)[] = [eq(snippets.authorId, userId)];
 
@@ -199,21 +289,42 @@ export async function listOwnSnippets(
     );
   }
 
+  const cursor = decodeCursor(page.cursor);
+  if (cursor) {
+    conditions.push(afterCursor(vaultCursorColumn(sort), cursor));
+  }
+
   const [rows, [countRow]] = await Promise.all([
     db
       .select()
       .from(snippets)
       .where(and(...conditions))
-      .orderBy(sortColumn(sort), snippets.id),
+      .orderBy(sortColumn(sort), snippets.id)
+      .limit(limit + 1),
     db
       .select({ n: sql`count(*)`.mapWith(Number) })
       .from(snippets)
       .where(eq(snippets.authorId, userId)),
   ]);
 
+  // limit+1 probe: an extra row means another page exists
+  let nextCursor: string | null = null;
+  let pageRows = rows;
+  if (rows.length > limit) {
+    pageRows = rows.slice(0, limit);
+    const last = pageRows[pageRows.length - 1];
+    if (last) {
+      nextCursor = encodeCursor({
+        v: vaultCursorValue(sort, last),
+        id: last.id,
+      });
+    }
+  }
+
   return {
-    snippets: await hydrate(rows, userId),
+    snippets: await hydrate(pageRows, userId),
     total: countRow?.n ?? 0,
+    nextCursor,
   };
 }
 
@@ -335,11 +446,14 @@ export async function exploreSnippets(opts: {
   viewerId: string | null;
   q?: string;
   starredOnly?: boolean;
-}): Promise<HydratedSnippet[]> {
+  limit?: number;
+  cursor?: string | null;
+}): Promise<{ snippets: HydratedSnippet[]; nextCursor: string | null }> {
   const { viewerId, q = "", starredOnly = false } = opts;
+  const limit = clampLimit(opts.limit);
 
   // "starred only" without a viewer is an empty set, not the whole feed
-  if (starredOnly && !viewerId) return [];
+  if (starredOnly && !viewerId) return { snippets: [], nextCursor: null };
 
   const conditions: (SQL | undefined)[] = [eq(snippets.visibility, "public")];
 
@@ -381,16 +495,46 @@ export async function exploreSnippets(opts: {
     );
   }
 
+  // keyset over (favorites DESC, updated_at DESC, id ASC)
+  const cursor = decodeCursor(opts.cursor);
+  if (cursor && typeof cursor.v === "number" && cursor.u) {
+    const at = new Date(cursor.u);
+    if (!Number.isNaN(at.getTime())) {
+      const f = cursor.v;
+      const cid = cursor.id;
+      conditions.push(sql`(
+        ${snippets.favorites} < ${f} OR
+        (${snippets.favorites} = ${f} AND ${snippets.updatedAt} < ${at}) OR
+        (${snippets.favorites} = ${f} AND ${snippets.updatedAt} = ${at} AND ${snippets.id} > ${cid})
+      )`);
+    }
+  }
+
   const rows = await db
     .select({ snippets })
     .from(snippets)
     .where(and(...conditions))
-    .orderBy(desc(snippets.favorites), desc(snippets.updatedAt), snippets.id);
+    .orderBy(desc(snippets.favorites), desc(snippets.updatedAt), snippets.id)
+    .limit(limit + 1);
 
-  return hydrate(
-    rows.map((row) => row.snippets),
-    viewerId,
-  );
+  let nextCursor: string | null = null;
+  let pageRows = rows.map((row) => row.snippets);
+  if (pageRows.length > limit) {
+    pageRows = pageRows.slice(0, limit);
+    const last = pageRows[pageRows.length - 1];
+    if (last) {
+      nextCursor = encodeCursor({
+        v: last.favorites,
+        u: last.updatedAt.toISOString(),
+        id: last.id,
+      });
+    }
+  }
+
+  return {
+    snippets: await hydrate(pageRows, viewerId),
+    nextCursor,
+  };
 }
 
 /* ------------------------------------------------------------------ *

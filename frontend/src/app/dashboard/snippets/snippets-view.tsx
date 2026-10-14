@@ -9,6 +9,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SnippetCard } from "@/components/dashboard/snippet-card";
 import { Button } from "@/components/ui/button";
 import { deleteSnippet } from "@/server/actions/snippets";
+import { fetchVaultPage } from "@/server/actions/reads";
 import type { HydratedSnippet, Visibility } from "@/lib/snippet-types";
 import { staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,7 @@ type SnippetsViewProps = {
   tags: string[];
   total: number;
   filters: SnippetFilters;
+  initialCursor: string | null;
 };
 
 const sortOptions: { label: string; value: SnippetFilters["sort"] }[] = [
@@ -55,9 +57,14 @@ function toQueryString(filters: SnippetFilters) {
   return `/dashboard/snippets${query ? `?${query}` : ""}`;
 }
 
-export function SnippetsView({ snippets, tags, total, filters }: SnippetsViewProps) {
+export function SnippetsView({ snippets: initial, tags, total, filters, initialCursor }: SnippetsViewProps) {
   const router = useRouter();
   const [query, setQuery] = useState(filters.q);
+  // keyset pages append locally; the page remounts this view (key) whenever
+  // the filter or the underlying rows change, so this state never goes stale
+  const [items, setItems] = useState(initial);
+  const [cursor, setCursor] = useState<string | null>(initialCursor);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const replace = (next: SnippetFilters) => {
     router.replace(toQueryString(next), { scroll: false });
@@ -82,8 +89,21 @@ export function SnippetsView({ snippets, tags, total, filters }: SnippetsViewPro
   };
 
   const hasFilters = Boolean(query || filters.tag || filters.visibility !== "all");
-  // remount the grid when the filter changes so card state never goes stale
-  const filterKey = `${filters.q.trim()}|${filters.tag}|${filters.visibility}|${filters.sort}`;
+
+  const loadMore = async () => {
+    if (!cursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const page = await fetchVaultPage(filters, cursor);
+      setItems((prev) => {
+        const seen = new Set(prev.map((item) => item.id));
+        return [...prev, ...page.snippets.filter((item) => !seen.has(item.id))];
+      });
+      setCursor(page.nextCursor);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     try {
@@ -190,7 +210,7 @@ export function SnippetsView({ snippets, tags, total, filters }: SnippetsViewPro
 
         <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
           <span className="font-mono text-xs text-muted-foreground">
-            {snippets.length} of {total} shown
+            {items.length} of {total} shown
           </span>
           <div className="flex items-center gap-2">
             <label
@@ -217,23 +237,36 @@ export function SnippetsView({ snippets, tags, total, filters }: SnippetsViewPro
         </div>
       </div>
 
-      {snippets.length > 0 ? (
-        <motion.div
-          key={filterKey}
-          variants={staggerContainer(0.06)}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {snippets.map((snippet, index) => (
-            <SnippetCard
-              key={snippet.id}
-              snippet={snippet}
-              index={index}
-              onDelete={handleDelete}
-            />
-          ))}
-        </motion.div>
+      {items.length > 0 ? (
+        <>
+          <motion.div
+            variants={staggerContainer(0.06)}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {items.map((snippet, index) => (
+              <SnippetCard
+                key={snippet.id}
+                snippet={snippet}
+                index={index}
+                onDelete={handleDelete}
+              />
+            ))}
+          </motion.div>
+          {cursor && (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                className="h-9 gap-2 rounded-full px-6"
+                onClick={loadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? "Loading…" : "Load more"}
+              </Button>
+            </div>
+          )}
+        </>
       ) : hasFilters ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/30 px-6 py-16 text-center">
           <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40">

@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { ExploreView } from "@/app/dashboard/explore/explore-view";
 import { auth } from "@/server/auth";
 import { exploreSnippets } from "@/server/queries";
-import type { HydratedSnippet } from "@/lib/snippet-types";
 
 type ExplorePageProps = {
   searchParams: Promise<{ q?: string; starred?: string }>;
@@ -19,11 +18,19 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const q = params.q ?? "";
   const starredOnly = params.starred === "1";
 
-  const snippets: HydratedSnippet[] = await exploreSnippets({
+  const { snippets, nextCursor } = await exploreSnippets({
     viewerId: session?.user.id ?? null,
     q,
     starredOnly,
   });
 
-  return <ExploreView snippets={snippets} q={q} starredOnly={starredOnly} />;
+  return (
+    <ExploreView
+      key={`${q}|${starredOnly}|${snippets.map((s) => s.id).join(",")}`}
+      snippets={snippets}
+      q={q}
+      starredOnly={starredOnly}
+      initialCursor={nextCursor}
+    />
+  );
 }
