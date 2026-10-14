@@ -48,22 +48,26 @@ export default async function SnippetsPage({ searchParams }: SnippetsPageProps) 
   const userId = session?.user.id;
   const { view, query } = parseFilters(await searchParams);
 
-  const [{ snippets, total }, tagCounts]: [
-    { snippets: HydratedSnippet[]; total: number },
+  const [{ snippets, total, nextCursor }, tagCounts]: [
+    { snippets: HydratedSnippet[]; total: number; nextCursor: string | null },
     Array<[string, number]>,
   ] = userId
     ? await Promise.all([
         listOwnSnippets(userId, query),
         getTagCounts(userId),
       ])
-    : [{ snippets: [], total: 0 }, []];
+    : [{ snippets: [], total: 0, nextCursor: null }, []];
 
   return (
     <SnippetsView
+      key={`${view.q}|${view.tag}|${view.visibility}|${view.sort}|${snippets
+        .map((s) => `${s.id}:${s.updatedAt}`)
+        .join(",")}`}
       snippets={snippets}
       tags={tagCounts.map(([tag]) => tag)}
       total={total}
       filters={view}
+      initialCursor={nextCursor}
     />
   );
 }

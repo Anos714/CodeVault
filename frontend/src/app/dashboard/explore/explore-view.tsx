@@ -6,6 +6,8 @@ import { motion } from "motion/react";
 import { Globe, Search, Star, X } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SnippetCard } from "@/components/dashboard/snippet-card";
+import { Button } from "@/components/ui/button";
+import { fetchExplorePage } from "@/server/actions/reads";
 import type { HydratedSnippet } from "@/lib/snippet-types";
 import { staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -14,6 +16,7 @@ type ExploreViewProps = {
   snippets: HydratedSnippet[];
   q: string;
   starredOnly: boolean;
+  initialCursor: string | null;
 };
 
 function useDebouncedValue<T>(value: T, delay = 250) {
@@ -35,9 +38,12 @@ function toQueryString(q: string, starredOnly: boolean) {
   return `/dashboard/explore${query ? `?${query}` : ""}`;
 }
 
-export function ExploreView({ snippets, q, starredOnly }: ExploreViewProps) {
+export function ExploreView({ snippets: initial, q, starredOnly, initialCursor }: ExploreViewProps) {
   const router = useRouter();
   const [query, setQuery] = useState(q);
+  const [items, setItems] = useState(initial);
+  const [cursor, setCursor] = useState<string | null>(initialCursor);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const replace = (nextQ: string, nextStarred: boolean) => {
     router.replace(toQueryString(nextQ, nextStarred), { scroll: false });
@@ -50,6 +56,21 @@ export function ExploreView({ snippets, q, starredOnly }: ExploreViewProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
+
+  const loadMore = async () => {
+    if (!cursor || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const page = await fetchExplorePage({ q, starredOnly }, cursor);
+      setItems((prev) => {
+        const seen = new Set(prev.map((item) => item.id));
+        return [...prev, ...page.snippets.filter((item) => !seen.has(item.id))];
+      });
+      setCursor(page.nextCursor);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
@@ -105,27 +126,40 @@ export function ExploreView({ snippets, q, starredOnly }: ExploreViewProps) {
           </button>
         </div>
         <span className="font-mono text-xs text-muted-foreground">
-          {snippets.length} public snippet{snippets.length === 1 ? "" : "s"}
+          {items.length} public snippet{items.length === 1 ? "" : "s"}
         </span>
       </div>
 
-      {snippets.length > 0 ? (
-        <motion.div
-          key={`${q.trim()}|${starredOnly}`}
-          variants={staggerContainer(0.06)}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {snippets.map((snippet, index) => (
-            <SnippetCard
-              key={snippet.id}
-              snippet={snippet}
-              showAuthor
-              index={index}
-            />
-          ))}
-        </motion.div>
+      {items.length > 0 ? (
+        <>
+          <motion.div
+            variants={staggerContainer(0.06)}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {items.map((snippet, index) => (
+              <SnippetCard
+                key={snippet.id}
+                snippet={snippet}
+                showAuthor
+                index={index}
+              />
+            ))}
+          </motion.div>
+          {cursor && (
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                className="h-9 gap-2 rounded-full px-6"
+                onClick={loadMore}
+                disabled={loadingMore}
+              >
+                {loadingMore ? "Loading…" : "Load more"}
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/30 px-6 py-16 text-center">
           <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40">
