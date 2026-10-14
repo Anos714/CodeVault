@@ -8,10 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
+    "db:generate": "node scripts/drizzle.mjs generate",
+    "db:migrate": "node scripts/drizzle.mjs migrate",
+    "db:push": "node scripts/drizzle.mjs push",
+    "db:studio": "node scripts/drizzle.mjs studio",
     "db:seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
@@ -39,12 +39,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
+    "pg": "^8.23.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

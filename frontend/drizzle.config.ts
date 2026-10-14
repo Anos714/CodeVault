@@ -6,8 +6,9 @@ import { defineConfig } from "drizzle-kit";
  * the *unpooled* endpoint. The app itself uses the pooled HTTP driver — see
  * src/server/db/index.ts.
  *
- * Bun loads .env.local automatically when running these commands; plain node
- * (npx drizzle-kit) does not, so prefer `bun run db:*`.
+ * Run through `bun run db:*` (scripts/drizzle.mjs): drizzle-kit breaks
+ * silently under the Bun runtime, so the wrapper re-runs it under Node and
+ * preloads `.env.local` itself.
  */
 
 export default defineConfig({
