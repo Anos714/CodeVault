@@ -6,7 +6,7 @@ CodeVault turns scattered gists, pasted utilities and copy-pasted Stack Overflow
 
 Sign in with Google, GitHub, or one click as the demo account. Everything saves to your vault.
 
-[![CodeVault dashboard](https://media.licdn.com/dms/image/v2/D5622AQFp82Vv7zugug/feedshare-shrink_2048_1536/B56Zv7EitUI4Ak-/0/1769443830896?e=1770854400&v=beta&t=0HkdbWeX_qfL5ehdm78Jm55AQYDLHBkmnecvVla5Uvc)](https://codevault-olive.vercel.app/)
+[![CodeVault landing](docs/images/hero-landing.jpg)](https://codevault-olive.vercel.app/)
 
 [Live demo](https://codevault-olive.vercel.app/) · [GitHub](https://github.com/Anos714/CodeVault)
 
@@ -47,21 +47,31 @@ Sign in with Google, GitHub, or one click as the demo account. Everything saves 
 
 ## Screenshots
 
-Browse and manage all snippets
+Dashboard overview with stats and recent snippets
 
-Add or edit snippets with syntax highlighting
+Your vault with search, filters and sorting
 
-![Dashboard](https://media.licdn.com/dms/image/v2/D5622AQFp82Vv7zugug/feedshare-shrink_2048_1536/B56Zv7EitUI4Ak-/0/1769443830896?e=1770854400&v=beta&t=0HkdbWeX_qfL5ehdm78Jm55AQYDLHBkmnecvVla5Uvc)
+![Dashboard overview](docs/images/dashboard-overview.jpg)
 
-![Editor](https://media.licdn.com/dms/image/v2/D5622AQFBKMfP3ml0sw/feedshare-shrink_1280/B56Zv7EiAZIYAk-/0/1769443827989?e=1770854400&v=beta&t=oRRDySxvrVmdB3GapZ3oIizCZNMkcVwLyI81vpfriq4)
+![Vault list](docs/images/vault-list.jpg)
 
-Beautiful code viewer with copy feature
+Snippet detail with the full toolbar
 
-Fully responsive on all devices
+Composer with templates and live preview
 
-![View Page](https://media.licdn.com/dms/image/v2/D5622AQGSMV2H5rZRFA/feedshare-shrink_1280/B56Zv7EiIDIUAc-/0/1769443828520?e=1770854400&v=beta&t=b1_vH17-_hwTaJNgKsQv9QknYSNRI)
+![Snippet detail](docs/images/snippet-detail.jpg)
 
-![Mobile View](https://media.licdn.com/dms/image/v2/D5622AQFLC2SHUeEPpA/feedshare-shrink_1280/B56Zv7EhFxJ8Ac-/0/1769443824201?e=1770854400&v=beta&t=LX3lyRamB9XthJHfOAJtvpfUdr1YYoWZityis3h8ySQ)
+![Composer](docs/images/composer.jpg)
+
+Public explore feed
+
+Tags, languages, and the unlisted share page
+
+![Explore](docs/images/explore.jpg)
+
+![Tags](docs/images/tags.jpg)
+
+![Share page](docs/images/share-page.jpg)
 
 ## Tech stack
 
