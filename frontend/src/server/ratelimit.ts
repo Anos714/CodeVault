@@ -5,6 +5,8 @@
  * - `demo` — demo sign-ins per IP (30/min; the E2E suite signs in ~10×).
  * - `share-read` — unlisted reads (/s, /embed, /c, OG) per IP (100/min).
  * - `write` — mutations per user id (60/min).
+ * - `api-read` — authenticated `/api/v1` reads per user id (240/min).
+ * - `api-write` — authenticated `/api/v1` mutations per user id (60/min).
  *
  * Redis is a protection layer, never a dependency: unconfigured credentials
  * or a Redis outage both fail OPEN (allowed), exactly like the app boots
@@ -15,7 +17,12 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-export type LimitKind = "demo" | "share-read" | "write";
+export type LimitKind =
+  | "demo"
+  | "share-read"
+  | "write"
+  | "api-read"
+  | "api-write";
 
 type Window = `${number} ${"ms" | "s" | "m" | "h" | "d" | "w"}`;
 
@@ -23,6 +30,8 @@ const WINDOWS: Record<LimitKind, [number, Window]> = {
   demo: [30, "1 m"],
   "share-read": [100, "1 m"],
   write: [60, "1 m"],
+  "api-read": [240, "1 m"],
+  "api-write": [60, "1 m"],
 };
 
 let redis: Redis | null | undefined;

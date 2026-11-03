@@ -237,6 +237,37 @@ export const collectionSnippets = pgTable(
   ],
 );
 
+/**
+ * Personal access tokens for the REST API (`/api/v1`) and the browser/editor
+ * extensions. Only the SHA-256 hash is stored — the raw `cv_pat_…` value is
+ * returned once at creation and can never be read back.
+ */
+export const apiTokens = pgTable(
+  "api_tokens",
+  {
+    id: text("id")
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => `tok_${crypto.randomUUID()}`),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    /** human label, e.g. "Chrome extension" */
+    name: text("name").notNull(),
+    /** SHA-256 hex of the raw token */
+    tokenHash: text("token_hash").notNull().unique(),
+    /** first characters of the raw token, shown in the UI to identify it */
+    prefix: text("prefix").notNull(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("api_tokens_user_id_idx").on(t.userId)],
+);
+
 /** Unlisted links for collections — same pattern as snippet share_links. */
 export const collectionLinks = pgTable(
   "collection_links",
