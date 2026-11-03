@@ -212,7 +212,7 @@ export function SettingsView({
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
               />
             </label>
             <label
@@ -225,8 +225,15 @@ export function SettingsView({
                 type="email"
                 value={email}
                 disabled
+                aria-describedby="settings-email-hint"
                 className="h-10 rounded-lg border border-border bg-muted/40 px-3 font-sans text-sm text-muted-foreground outline-none"
               />
+              <span
+                id="settings-email-hint"
+                className="normal-case tracking-normal text-xs text-muted-foreground/70"
+              >
+                Comes from your sign-in provider — change it there, not here.
+              </span>
             </label>
           </div>
 
@@ -327,7 +334,7 @@ export function SettingsView({
               onChange={(event) => setTokenName(event.target.value)}
               placeholder="Chrome extension"
               maxLength={60}
-              className="h-10 flex-1 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="h-10 flex-1 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
             />
             <Button
               type="submit"
