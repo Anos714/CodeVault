@@ -9,103 +9,75 @@ type LogoMarkProps = {
 };
 
 /**
- * CodeVault mark — stacked code blocks forming a vault.
- * Static by default; animates a layered draw-in when `animated`.
+ * CodeVault mark — a soft glass tile wrapping an ink app icon, with the
+ * signature `</>` window. The frame stays light and the tile stays ink so
+ * the mark reads the same on the paper site and the dark floating nav.
  */
 export function LogoMark({ className, animated = false }: LogoMarkProps) {
-  const layers = [
-    {
-      y: 29,
-      fillOpacity: 0.1,
-      strokeOpacity: 0.22,
-      className: "stroke-[#2FBF9B] fill-[#2FBF9B]",
-    },
-    {
-      y: 23,
-      fillOpacity: 0.16,
-      strokeOpacity: 0.32,
-      className: "stroke-[#2FBF9B] fill-[#2FBF9B]",
-    },
-  ];
-
   const content = (
     <>
-      <defs>
-        <linearGradient id="cv-bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#0F151B" />
-          <stop offset="1" stopColor="#182230" />
-        </linearGradient>
-        <linearGradient id="cv-accent" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#2FBF9B" />
-          <stop offset="1" stopColor="#5BC0EB" />
-        </linearGradient>
-        <radialGradient id="cv-glow" cx="0.5" cy="0.42" r="0.62">
-          <stop offset="0" stopColor="#2FBF9B" stopOpacity="0.3" />
-          <stop offset="1" stopColor="#2FBF9B" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#cv-bg)" />
-      <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#cv-glow)" />
+      {/* glass frame */}
+      <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="15.25" fill="#eceef2" />
       <rect
-        x="2.75"
-        y="2.75"
-        width="58.5"
-        height="58.5"
-        rx="15.25"
-        stroke="url(#cv-accent)"
-        strokeOpacity="0.45"
-        strokeWidth="1.5"
+        x="1.6"
+        y="1.6"
+        width="60.8"
+        height="60.8"
+        rx="14.9"
+        fill="none"
+        stroke="#ffffff"
+        strokeOpacity="0.9"
+        strokeWidth="0.8"
       />
 
-      {/* stacked layers */}
-      {layers.map((layer, i) => (
-        <rect
-          key={i}
-          x="15"
-          y={layer.y}
-          width="34"
-          height="20"
-          rx="5"
-          fillOpacity={layer.fillOpacity}
-          strokeOpacity={layer.strokeOpacity}
-          strokeWidth="1.5"
-          className={layer.className}
-        />
-      ))}
+      {/* ink tile */}
+      <rect x="5.75" y="5.75" width="52.5" height="52.5" rx="12.75" fill="#0b0b0f" />
+      <rect
+        x="6.15"
+        y="6.15"
+        width="51.7"
+        height="51.7"
+        rx="12.35"
+        fill="none"
+        stroke="#ffffff"
+        strokeOpacity="0.1"
+        strokeWidth="0.8"
+      />
 
-      {/* top code window */}
+      {/* code window */}
       <rect
-        x="15"
-        y="17"
-        width="34"
-        height="21"
-        rx="5"
-        fill="#0C1116"
-        stroke="url(#cv-accent)"
-        strokeOpacity="0.85"
-        strokeWidth="1.6"
+        x="17.5"
+        y="20.75"
+        width="29"
+        height="22.5"
+        rx="6"
+        fill="none"
+        stroke="#ffffff"
+        strokeOpacity="0.92"
+        strokeWidth="2"
       />
-      <circle cx="21.5" cy="23.5" r="1.9" fill="#E8B84B" />
-      <circle cx="28" cy="23.5" r="1.9" fill="#2FBF9B" />
-      <circle cx="34.5" cy="23.5" r="1.9" fill="#6E9BE8" />
-      <rect
-        x="21"
-        y="29"
-        width="14"
-        height="2.2"
-        rx="1.1"
-        fill="#6E9BE8"
-        fillOpacity="0.85"
+      <path
+        d="M26.5 26.75 22.75 32l3.75 5.25"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-      <rect
-        x="21"
-        y="33.5"
-        width="19"
-        height="2.2"
-        rx="1.1"
-        fill="#8FA6BC"
-        fillOpacity="0.7"
+      <path
+        d="M37.5 26.75 41.25 32l-3.75 5.25"
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M34.5 25.75 29.5 38.25"
+        fill="none"
+        stroke="#9eccff"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </>
   );
@@ -135,7 +107,10 @@ export function LogoMark({ className, animated = false }: LogoMarkProps) {
       animate="visible"
     >
       <motion.g
-        variants={{ hidden: { opacity: 0, scale: 0.9 }, visible: { opacity: 1, scale: 1 } }}
+        variants={{
+          hidden: { opacity: 0, scale: 0.9 },
+          visible: { opacity: 1, scale: 1 },
+        }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
         {content}
@@ -161,8 +136,8 @@ export function Logo({
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <LogoMark className={markClassName} animated={animated} />
       {showWordmark && (
-        <span className="text-[1.05rem] font-semibold tracking-tight text-foreground">
-          Code<span className="text-primary">Vault</span>
+        <span className="text-[1.05rem] font-[650] tracking-[-0.02em] text-current">
+          CodeVault
         </span>
       )}
     </span>

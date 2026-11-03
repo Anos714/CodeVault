@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
-   CodeVault design tokens
-   "Terminal Sage" — calm blue-slate neutrals + muted emerald,
-   with a syntax-highlighting accent system (keyword/string/…)
+   CodeVault design system
+   "Paper & Hills" — warm white paper, near-black ink, soft grey
+   panels, and a pastel accent family. Inspired by gettapmac.com.
    ============================================================ */
 @theme inline {
   --color-background: var(--background);
@@ -29,8 +29,20 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* brand + syntax accents */
+  /* brand + pastel accents */
   --color-brand: var(--primary);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-panel: var(--panel);
+  --color-line: var(--line);
+  --color-sky: var(--sky);
+  --color-aqua: var(--aqua);
+  --color-blush: var(--blush);
+  --color-butter: var(--butter);
+  --color-periwinkle: var(--periwinkle);
+  --color-success: var(--success);
+
+  /* syntax accents */
   --color-syntax-keyword: var(--syntax-keyword);
   --color-syntax-string: var(--syntax-string);
   --color-syntax-function: var(--syntax-function);
@@ -38,77 +50,112 @@
   --color-syntax-comment: var(--syntax-comment);
   --color-syntax-punctuation: var(--syntax-punctuation);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
+  --font-serif: var(--font-instrument-serif), "New York", Georgia, serif;
+  --font-rounded: var(--font-nunito), ui-rounded, "SF Pro Rounded", system-ui,
+    sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.55);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-3xl: calc(var(--radius) * 2);
+  --radius-4xl: calc(var(--radius) * 2.5);
+
+  --ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
 }
 
-/* ---------- Light (warm-cool paper) ---------- */
+/* ---------- Light (paper) — the default ---------- */
 :root {
-  --background: oklch(0.992 0.003 240);
-  --foreground: oklch(0.232 0.010 255);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.232 0.010 255);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.232 0.010 255);
-  --primary: oklch(0.548 0.108 172);
-  --primary-foreground: oklch(0.985 0.006 172);
-  --secondary: oklch(0.968 0.005 240);
-  --secondary-foreground: oklch(0.28 0.010 255);
-  --muted: oklch(0.968 0.005 240);
-  --muted-foreground: oklch(0.518 0.012 255);
-  --accent: oklch(0.955 0.010 200);
-  --accent-foreground: oklch(0.28 0.010 255);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.908 0.006 245);
-  --input: oklch(0.908 0.006 245);
-  --ring: oklch(0.548 0.108 172 / 55%);
+  --background: #ffffff;
+  --foreground: #0b0b0f;
+  --card: #ffffff;
+  --card-foreground: #0b0b0f;
+  --popover: #ffffff;
+  --popover-foreground: #0b0b0f;
 
-  --syntax-keyword: oklch(0.48 0.152 300);
-  --syntax-string: oklch(0.42 0.108 152);
-  --syntax-function: oklch(0.47 0.124 228);
-  --syntax-number: oklch(0.52 0.132 58);
-  --syntax-comment: oklch(0.55 0.010 255);
-  --syntax-punctuation: oklch(0.45 0.008 255);
+  --primary: #0b0b0f;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f7;
+  --secondary-foreground: #0b0b0f;
+  --muted: #f5f5f7;
+  --muted-foreground: #6e6e73;
+  --accent: #f5f5f7;
+  --accent-foreground: #0b0b0f;
+  --destructive: #d9444b;
 
-  --radius: 0.7rem;
+  --border: rgba(11, 11, 15, 0.1);
+  --input: rgba(11, 11, 15, 0.14);
+  --ring: rgba(158, 204, 255, 0.9);
+
+  --ink: #0b0b0f;
+  --soft: #6e6e73;
+  --panel: #f5f5f7;
+  --line: rgba(11, 11, 15, 0.1);
+
+  --sky: #9eccff;
+  --aqua: #9ee0f2;
+  --blush: #fa8c8f;
+  --butter: #ffd673;
+  --periwinkle: #b3bdff;
+  --success: #33995c;
+
+  --syntax-keyword: #8a4baf;
+  --syntax-string: #2f7d55;
+  --syntax-function: #1d6fd6;
+  --syntax-number: #b45309;
+  --syntax-comment: #8a8a93;
+  --syntax-punctuation: #55555c;
+
+  --radius: 1rem;
 }
 
-/* ---------- Dark (default: deep blue-slate) ---------- */
+/* ---------- Dark (deep ink) ---------- */
 .dark {
-  --background: oklch(0.156 0.006 255);
-  --foreground: oklch(0.945 0.004 248);
-  --card: oklch(0.194 0.007 255);
-  --card-foreground: oklch(0.945 0.004 248);
-  --popover: oklch(0.212 0.007 255);
-  --popover-foreground: oklch(0.945 0.004 248);
-  --primary: oklch(0.705 0.102 170);
-  --primary-foreground: oklch(0.158 0.024 172);
-  --secondary: oklch(0.243 0.007 255);
-  --secondary-foreground: oklch(0.945 0.004 248);
-  --muted: oklch(0.229 0.007 255);
-  --muted-foreground: oklch(0.665 0.011 255);
-  --accent: oklch(0.243 0.009 240);
-  --accent-foreground: oklch(0.945 0.004 248);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.705 0.102 170 / 45%);
+  --background: #0b0b0f;
+  --foreground: #f5f5f7;
+  --card: #141418;
+  --card-foreground: #f5f5f7;
+  --popover: #17171b;
+  --popover-foreground: #f5f5f7;
 
-  --syntax-keyword: oklch(0.745 0.142 300);
-  --syntax-string: oklch(0.745 0.112 152);
-  --syntax-function: oklch(0.765 0.112 228);
-  --syntax-number: oklch(0.785 0.128 58);
-  --syntax-comment: oklch(0.60 0.010 255);
-  --syntax-punctuation: oklch(0.80 0.006 248);
+  --primary: #f5f5f7;
+  --primary-foreground: #0b0b0f;
+  --secondary: #1c1c21;
+  --secondary-foreground: #f5f5f7;
+  --muted: #1c1c21;
+  --muted-foreground: #a1a1a6;
+  --accent: #1c1c21;
+  --accent-foreground: #f5f5f7;
+  --destructive: #f06a70;
+
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: rgba(158, 204, 255, 0.7);
+
+  --ink: #f5f5f7;
+  --soft: #a1a1a6;
+  --panel: #17171b;
+  --line: rgba(255, 255, 255, 0.12);
+
+  --sky: #8dc0fb;
+  --aqua: #8fd8ec;
+  --blush: #ff9ea1;
+  --butter: #ffdf93;
+  --periwinkle: #c0c8ff;
+  --success: #5cc98a;
+
+  --syntax-keyword: #d0a2f0;
+  --syntax-string: #8fd8a8;
+  --syntax-function: #8fc2ff;
+  --syntax-number: #ffc48a;
+  --syntax-comment: #86868b;
+  --syntax-punctuation: #c7c7cc;
 }
 
 @layer base {
@@ -118,14 +165,29 @@
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    scroll-padding-top: 96px;
   }
   body {
     @apply bg-background text-foreground;
+    font-size: 17px;
+    line-height: 1.5;
+    letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    letter-spacing: -0.045em;
+  }
+  p {
+    text-wrap: pretty;
+  }
   ::selection {
-    background-color: color-mix(in oklch, var(--primary) 26%, transparent);
+    background-color: color-mix(in srgb, var(--sky) 65%, transparent);
+    color: var(--ink);
   }
   /* calm, minimal scrollbar */
   ::-webkit-scrollbar {
@@ -133,68 +195,290 @@
     height: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+    background: color-mix(in srgb, var(--soft) 32%, transparent);
     border-radius: 9999px;
     border: 3px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in oklch, var(--muted-foreground) 45%, transparent);
+    background: color-mix(in srgb, var(--soft) 48%, transparent);
     background-clip: padding-box;
   }
 }
 
 /* ============================================================
-   Background patterns
+   Layout + typographic utilities
    ============================================================ */
+
+.wrap {
+  width: 100%;
+  max-width: 1160px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+/* Instrument Serif italic accent — the reference's signature flourish */
+.accent-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  font-size: 1.07em;
+  line-height: 0.95;
+}
+
+.eyebrow {
+  color: var(--soft);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.section-head {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.section-title {
+  font-size: clamp(34px, 5.2vw, 64px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
+}
+
+.lead {
+  color: var(--soft);
+  max-width: 580px;
+  margin: 18px auto 0;
+  font-size: clamp(17px, 1.9vw, 20px);
+  text-wrap: balance;
+}
+
+/* ============================================================
+   Hero + hills imagery
+   ============================================================ */
+
+.hero {
+  position: relative;
+  display: flex;
+  min-height: 600px;
+  height: 100svh;
+  overflow-x: clip;
+  color: #fff;
+  text-align: center;
+  background: linear-gradient(#3f9fe6 0% 60%, rgba(63, 159, 230, 0) 82%);
+}
+
+.hero-bg {
+  --tail: clamp(180px, 30vh, 300px);
+  position: absolute;
+  inset: 0 0 calc(var(--tail) * -1);
+  pointer-events: none;
+  background-image: image-set(
+    url("/bg/hills.avif") 1x type("image/avif"),
+    url("/bg/hills.jpg") 1x type("image/jpeg")
+  );
+  background-position: 50% 40%;
+  background-size: cover;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 calc(100% - var(--tail) * 1.25),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 calc(100% - var(--tail) * 1.25),
+    transparent 100%
+  );
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      rgba(8, 62, 150, 0.62) 0%,
+      rgba(8, 70, 160, 0.34) 34%,
+      rgba(8, 70, 160, 0) 58%
+    ),
+    radial-gradient(58% 34%, rgba(6, 56, 140, 0.4), rgba(6, 56, 140, 0)),
+    radial-gradient(
+      46% 16% at 50% 66%,
+      rgba(10, 50, 30, 0.38),
+      rgba(10, 50, 30, 0)
+    );
+}
+
+.kicker {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 12px rgba(6, 40, 70, 0.6);
+  font-size: clamp(14px, 1.9vh, 17px);
+  font-weight: 400;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: clamp(42px, min(8.2vw, 11.4vh), 108px);
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  text-shadow: 0 2px 26px rgba(6, 56, 140, 0.4);
+}
+
+.hero-title .line {
+  display: block;
+}
+
+.hero-title .line.accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.07em;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.hero-sub {
+  max-width: 610px;
+  margin-top: clamp(12px, 2.4vh, 24px);
+  padding-inline: 24px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: clamp(16px, 2.2vh, 20px);
+  line-height: 1.42;
+  text-shadow: 0 1px 12px rgba(6, 40, 70, 0.6);
+}
+
+.hero-fine {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 10px rgba(6, 40, 70, 0.6);
+  margin-top: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.hero-hint {
+  color: rgba(255, 255, 255, 0.86);
+  text-shadow: 0 1px 10px rgba(8, 14, 40, 0.5);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* solid hills card used by the final CTA / auth panel */.hills-card {
+  background:
+    linear-gradient(
+      rgba(8, 62, 150, 0.5),
+      rgba(8, 60, 120, 0.3) 45%,
+      rgba(10, 50, 30, 0.42)
+    ),
+    #3f9fe6
+      image-set(
+        url("/bg/hills.avif") 1x type("image/avif"),
+        url("/bg/hills.jpg") 1x type("image/jpeg")
+      )
+      50% 60% / cover;
+}
+
+.hills-fill {
+  background-color: #3f9fe6;
+  background-image: image-set(
+    url("/bg/hills.avif") 1x type("image/avif"),
+    url("/bg/hills.jpg") 1x type("image/jpeg")
+  );
+  background-position: 50% 55%;
+  background-size: cover;
+}
+
+/* ============================================================
+   Surfaces, patterns, effects
+   ============================================================ */
+
+.panel {
+  background: var(--panel);
+  border-radius: 28px;
+}
+
+.surface-glass {
+  background: color-mix(in srgb, var(--card) 82%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+/* dark floating navigation pill */
+.nav-floating {
+  background: linear-gradient(
+    rgba(38, 38, 42, 0.94),
+    rgba(14, 14, 16, 0.96)
+  );
+  backdrop-filter: blur(16px);
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 16px 36px -14px rgba(0, 0, 0, 0.5);
+}
 
 .bg-grid {
   background-image:
-    linear-gradient(to right, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 6%, transparent) 1px, transparent 1px);
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 56px 56px;
 }
 
-/* faint dot grid */
 .bg-dots {
   background-image: radial-gradient(
-    color-mix(in oklch, var(--foreground) 14%, transparent) 1px,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 1px,
     transparent 1px
   );
   background-size: 22px 22px;
 }
 
-/* mask that fades a pattern out toward the edges */
 .mask-fade {
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    #000 30%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    #000 30%,
+    transparent 100%
+  );
 }
 
-/* soft ambient glow used behind hero visuals */
 .glow-brand {
   background: radial-gradient(
     circle at center,
-    color-mix(in oklch, var(--primary) 20%, transparent),
+    color-mix(in srgb, var(--sky) 34%, transparent),
     transparent 68%
   );
 }
 
-/* glassy surface for floating cards */
-.surface-glass {
-  background: color-mix(in oklch, var(--card) 78%, transparent);
-  backdrop-filter: blur(12px);
-}
-
-/* gradient text, used sparingly for emphasis */
 .text-gradient-brand {
-  background: linear-gradient(
-    100deg,
-    var(--foreground) 20%,
-    color-mix(in oklch, var(--primary) 78%, var(--foreground)) 100%
-  );
+  background: linear-gradient(100deg, var(--foreground) 20%, var(--soft) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* soft pastel halo used behind hero / CTA art */
+.halo {
+  background: conic-gradient(
+    var(--butter),
+    var(--blush),
+    var(--periwinkle),
+    var(--sky),
+    var(--aqua),
+    var(--butter)
+  );
+  filter: blur(60px);
+  opacity: 0.4;
+  border-radius: 50%;
 }
 
 /* ------------------------------------------------------------
@@ -204,15 +488,16 @@
   scroll-margin-top: 6rem;
 }
 .prose-legal p {
-  text-pretty: balance;
+  text-wrap: pretty;
 }
 .prose-legal a {
-  color: var(--primary);
+  color: var(--ink);
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
+  text-decoration-line: underline;
 }
 .prose-legal a:hover {
-  text-decoration: underline;
+  color: var(--soft);
 }
 .prose-legal ul {
   margin: 0;
@@ -234,52 +519,91 @@
   width: 0.32rem;
   height: 0.32rem;
   border-radius: 9999px;
-  background: color-mix(in oklch, var(--primary) 70%, transparent);
+  background: color-mix(in srgb, var(--ink) 55%, transparent);
 }
 .prose-legal strong {
   color: var(--foreground);
   font-weight: 600;
 }
 
-/* shimmer line used on the animated code window */
+/* ============================================================
+   Animations
+   ============================================================ */
+
 @keyframes shimmer-x {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(220%); }
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
 }
 .animate-shimmer-x {
-  animation: shimmer-x 2.6s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) infinite;
+  animation: shimmer-x 2.6s
+    var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) infinite;
 }
 
-/* slow caret blink for the typing demo */
 @keyframes caret-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
 }
 .animate-caret {
   animation: caret-blink 1.1s steps(1) infinite;
 }
 
-/* traveling light pulse for the how-it-works connector */
 @keyframes travel-x {
-  0% { transform: translateX(-10%); opacity: 0; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  100% { transform: translateX(900%); opacity: 0; }
+  0% {
+    transform: translateX(-10%);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(900%);
+    opacity: 0;
+  }
 }
 .animate-travel-x {
-  animation: travel-x 3.4s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) infinite;
+  animation: travel-x 3.4s
+    var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) infinite;
 }
 
-/* testimonial marquee */
 @keyframes marquee-x {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 .animate-marquee-x {
-  animation: marquee-x var(--marquee-duration, 40s) linear infinite;
+  animation: marquee-x var(--marquee-duration, 46s) linear infinite;
 }
 .marquee-pause:hover {
   animation-play-state: paused;
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-float {
+  animation: float-y 7s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -26,23 +26,24 @@ export function SectionHeading({
       {...inViewProps}
       className={cn(
         "flex flex-col gap-4",
-        align === "center" ? "items-center text-center" : "items-start text-left",
+        align === "center"
+          ? "items-center text-center"
+          : "items-start text-left",
         className,
       )}
     >
       {eyebrow && (
-        <motion.span
-          variants={fadeUp}
-          className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground"
-        >
-          <span className="size-1.5 rounded-full bg-primary" aria-hidden />
+        <motion.span variants={fadeUp} className="eyebrow">
           {eyebrow}
         </motion.span>
       )}
 
       <motion.h2
         variants={fadeUp}
-        className="max-w-2xl text-balance text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+        className={cn(
+          "section-title max-w-3xl text-foreground",
+          align === "center" && "mx-auto",
+        )}
       >
         {title}
       </motion.h2>
@@ -50,7 +51,10 @@ export function SectionHeading({
       {description && (
         <motion.p
           variants={fadeUp}
-          className="max-w-xl text-pretty text-base leading-relaxed text-muted-foreground"
+          className={cn(
+            "lead max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-[17px]",
+            align === "center" && "mx-auto",
+          )}
         >
           {description}
         </motion.p>
