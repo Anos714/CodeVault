@@ -11,12 +11,12 @@ export function Topbar() {
   const setSidebarOpen = useUIStore((state) => state.setSidebarOpen);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-border bg-background/75 px-4 backdrop-blur-xl md:hidden">
+    <header className="sticky top-0 z-40 flex h-[72px] items-center gap-3 border-b border-line bg-background/80 px-4 backdrop-blur-xl md:hidden">
       <button
         type="button"
         onClick={() => setSidebarOpen(true)}
         aria-label="Open menu"
-        className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background/60 text-foreground transition-colors hover:bg-muted"
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl border border-line bg-panel text-foreground transition-colors hover:bg-secondary"
       >
         <Menu className="size-[1.05rem]" />
       </button>

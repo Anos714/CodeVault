@@ -22,29 +22,22 @@ export function StatsRow({ stats }: { stats: Stat[] }) {
         <motion.div
           key={label}
           variants={fadeUp}
-          className="relative overflow-hidden rounded-xl border border-border bg-card/50 p-4 transition-colors hover:bg-card"
+          className="relative overflow-hidden rounded-[22px] bg-panel p-4 transition-transform duration-300 hover:-translate-y-0.5 sm:p-5"
         >
-          <div
-            aria-hidden
-            className={cn(
-              "pointer-events-none absolute -right-8 -top-8 size-24 rounded-full opacity-60 blur-2xl",
-              accent,
-            )}
-          />
-          <div className="relative flex items-center gap-3">
+          <div className="flex items-center gap-3">
             <span
               className={cn(
-                "flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background/60",
+                "flex size-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-[inset_0_0_0_1px_rgba(11,11,15,0.06)]",
                 accent,
               )}
             >
               <Icon className="size-[1.05rem]" strokeWidth={1.9} />
             </span>
             <div className="flex min-w-0 flex-col">
-              <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+              <span className="font-rounded text-[0.66rem] font-bold uppercase tracking-[0.12em] text-soft/80">
                 {label}
               </span>
-              <span className="text-xl font-semibold tabular-nums text-foreground">
+              <span className="text-[26px] font-bold leading-tight tracking-[-0.04em] tabular-nums text-foreground">
                 {value}
               </span>
             </div>

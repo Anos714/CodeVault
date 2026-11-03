@@ -26,16 +26,16 @@ export function DashboardHeader({
     >
       <div className="flex flex-col gap-2">
         {eyebrow && (
-          <span className="inline-flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+          <span className="inline-flex items-center gap-2 font-rounded text-[0.68rem] font-bold uppercase tracking-[0.14em] text-soft/80">
             <span className="size-1.5 rounded-full bg-primary" aria-hidden />
             {eyebrow}
           </span>
         )}
-        <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        <h1 className="text-balance text-[clamp(28px,3.4vw,40px)] font-bold leading-[1.04] tracking-[-0.05em] text-foreground">
           {title}
         </h1>
         {description && (
-          <p className="max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-xl text-pretty text-[15px] leading-relaxed text-soft">
             {description}
           </p>
         )}

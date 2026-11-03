@@ -11,7 +11,7 @@ export default function DashboardLoading() {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="h-[4.5rem] animate-pulse rounded-xl border border-border bg-muted/40"
+            className="h-[5.5rem] animate-pulse rounded-[22px] bg-panel"
           />
         ))}
       </div>
@@ -20,7 +20,7 @@ export default function DashboardLoading() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col gap-3 rounded-2xl border border-border bg-muted/30 p-4"
+            className="flex flex-col gap-3 rounded-[22px] bg-panel p-4"
           >
             <div className="h-3 w-2/3 animate-pulse rounded bg-muted" />
             <div className="h-2.5 w-full animate-pulse rounded bg-muted/70" />
