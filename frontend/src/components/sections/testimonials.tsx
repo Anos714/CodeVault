@@ -61,6 +61,15 @@ const testimonials: Testimonial[] = [
     accent: "bg-aqua",
     tint: "from-aqua/30",
   },
+  {
+    quote:
+      "I search my vault from the VS Code command palette now. The snippet lands at my cursor, no tab switching, no copy-paste ritual.",
+    name: "Priya Raghunathan",
+    role: "Platform Engineer",
+    initials: "PR",
+    accent: "bg-sky",
+    tint: "from-sky/30",
+  },
 ];
 
 function Stars() {
@@ -100,7 +109,9 @@ function Card({ quote, name, role, initials, accent, tint }: Testimonial) {
       <div className="relative flex items-center gap-3">
         <span
           className={cn(
-            "grid size-10 shrink-0 place-items-center rounded-full font-rounded text-[13px] font-bold text-ink shadow-[inset_0_0_0_1px_rgba(11,11,15,0.08)]",
+            // the pastel accents stay pale in dark mode, so the initials need
+            // a fixed dark ink — `text-ink` flips to near-white and vanishes
+            "grid size-10 shrink-0 place-items-center rounded-full font-rounded text-[13px] font-bold text-[#0b0b0f] shadow-[inset_0_0_0_1px_rgba(11,11,15,0.08)]",
             accent,
           )}
         >
