@@ -138,6 +138,8 @@ export type CodeEditorProps = {
   onChange?: (value: string) => void;
   /** read-only viewer mode (snippet detail page) */
   readOnly?: boolean;
+  /** focus the editor on mount — opt-in, never automatic */
+  autoFocus?: boolean;
   /**
    * Editor height in px. Monaco's wrapper needs an explicit height — `auto`
    * collapses to zero and renders nothing — so strings other than numbers are
@@ -152,6 +154,7 @@ export function CodeEditor({
   language = "typescript",
   onChange,
   readOnly = false,
+  autoFocus = false,
   height = 360,
   className,
 }: CodeEditorProps) {
@@ -165,9 +168,9 @@ export function CodeEditor({
   const handleMount = useCallback(
     (editorInstance: editor.IStandaloneCodeEditor) => {
       editorRef.current = editorInstance;
-      editorInstance.focus();
+      if (autoFocus) editorInstance.focus();
     },
-    [],
+    [autoFocus],
   );
 
   // re-theme when the app theme flips

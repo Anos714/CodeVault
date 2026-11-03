@@ -226,6 +226,7 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
               value={code}
               language={language}
               onChange={setCode}
+              autoFocus
               height={340}
               aria-label="Snippet code"
             />

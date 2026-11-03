@@ -199,6 +199,7 @@ export function EditForm({ snippet }: EditFormProps) {
               value={code}
               language={language}
               onChange={setCode}
+              autoFocus
               height={340}
               aria-label="Snippet code"
             />
