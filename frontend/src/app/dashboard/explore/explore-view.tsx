@@ -93,7 +93,7 @@ export function ExploreView({ snippets: initial, q, starredOnly, initialCursor }
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search public snippets…"
               aria-label="Search public snippets"
-              className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
             />
             {query && (
               <button

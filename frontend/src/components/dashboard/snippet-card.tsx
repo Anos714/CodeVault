@@ -205,12 +205,12 @@ export function SnippetCard({
           ))}
         </div>
 
-        <div className="mt-auto flex items-center gap-3 border-t border-line pt-3 font-rounded text-[0.7rem] font-medium text-soft">
-          {showAuthor && <span>by {snippet.authorName}</span>}
-          <span className={showAuthor ? "ml-auto" : "mr-auto"}>
+        <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-3 font-rounded text-[0.7rem] font-medium text-soft">
+          {showAuthor && <span className="min-w-0 max-w-[45%] truncate">by {snippet.authorName}</span>}
+          <span className={cn("whitespace-nowrap", showAuthor ? "ml-auto" : "mr-auto")}>
             {mounted ? relativeTime(snippet.updatedAt) : formatDate(snippet.updatedAt)}
           </span>
-          <span className="inline-flex items-center gap-1">
+          <span className="inline-flex items-center gap-1 whitespace-nowrap">
             <Star className="size-3" fill="currentColor" strokeWidth={0} />
             {starCount}
           </span>

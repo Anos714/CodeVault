@@ -75,7 +75,7 @@ export function CollectionsView({ collections }: CollectionsViewProps) {
             placeholder="Name a collection… e.g. Interview prep"
             aria-label="Collection name"
             maxLength={60}
-            className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+            className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
           />
         </div>
         <Button

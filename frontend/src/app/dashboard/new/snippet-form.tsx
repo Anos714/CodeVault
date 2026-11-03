@@ -159,7 +159,7 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
                     onClick={() => setVisibility(value)}
                     className={cn(
                       "flex flex-1 items-center justify-center gap-1.5 rounded-lg border text-sm font-medium capitalize transition-all outline-none",
-                      "focus-visible:ring-2 focus-visible:ring-ring/50",
+                      "focus-visible:ring-2 focus-visible:ring-ring/70",
                       visibility === value
                         ? "border-primary/40 bg-primary/10 text-primary"
                         : "border-border bg-background/60 text-muted-foreground hover:text-foreground",
@@ -307,7 +307,7 @@ function Field({
 
 function inputClass(hasError: boolean) {
   return cn(
-    "h-10 w-full rounded-lg border bg-background/60 px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/50",
+    "h-10 w-full rounded-lg border bg-background/60 px-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/70",
     hasError
       ? "border-destructive/60 focus-visible:border-destructive"
       : "border-input focus-visible:border-ring",
