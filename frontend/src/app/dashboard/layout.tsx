@@ -15,7 +15,20 @@ export default async function DashboardLayout({
 }: LayoutProps<"/dashboard">) {
   const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!session) return <SignInGate />;
+  if (!session) {
+    const googleEnabled = Boolean(
+      process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+    );
+    const githubEnabled = Boolean(
+      process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET,
+    );
+    return (
+      <SignInGate
+        googleEnabled={googleEnabled}
+        githubEnabled={githubEnabled}
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-dvh w-full">

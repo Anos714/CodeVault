@@ -14,46 +14,75 @@ import { easeOutExpo } from "@/lib/motion";
 
 type PendingProvider = "google" | "github" | "demo" | null;
 
-export function SignInGate() {
+type SignInGateProps = {
+  /** only render providers whose credentials are actually configured */
+  googleEnabled: boolean;
+  githubEnabled: boolean;
+};
+
+export function SignInGate({
+  googleEnabled,
+  githubEnabled,
+}: SignInGateProps) {
   const router = useRouter();
   const [pending, setPending] = useState<PendingProvider>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSocial = async (provider: "google" | "github") => {
     setPending(provider);
+    setError(null);
     // hands the browser off to the OAuth provider; Better Auth redirects
     // back to the dashboard once the flow completes
-    await signIn.social({ provider, callbackURL: "/dashboard" });
+    try {
+      await signIn.social({ provider, callbackURL: "/dashboard" });
+    } catch {
+      setError("Could not start sign-in. Try the demo account instead.");
+      setPending(null);
+    }
   };
 
   const handleDemo = async () => {
     setPending("demo");
+    setError(null);
     // the route signs in as the seeded demo user and sets the session cookie
-    await fetch("/api/auth/demo", { method: "POST" });
-    router.refresh();
+    try {
+      const response = await fetch("/api/auth/demo", { method: "POST" });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "Demo sign-in failed.");
+      }
+      router.refresh();
+    } catch (err) {
+      setError(
+        err instanceof Error && err.message
+          ? err.message
+          : "Demo sign-in failed — try again.",
+      );
+      setPending(null);
+    }
   };
 
   const busy = pending !== null;
+  const hasSocial = googleEnabled || githubEnabled;
 
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden px-5 py-16">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-dots mask-fade opacity-40" />
-        <div className="absolute left-1/2 top-1/3 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
-      </div>
+    <div className="hills-fill relative flex min-h-dvh items-center justify-center overflow-hidden px-5 py-16">
+      <div className="hero-shade" aria-hidden />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: easeOutExpo }}
-        className="flex w-full max-w-md flex-col items-center gap-7 rounded-2xl border border-border bg-card/60 p-8 backdrop-blur-xl sm:p-10"
+        className="relative flex w-full max-w-md flex-col items-center gap-7 rounded-[28px] bg-background p-8 shadow-[0_40px_80px_-40px_rgba(6,30,60,0.6)] sm:p-10"
       >
         <div className="flex flex-col items-center gap-4">
           <Logo animated markClassName="size-12" />
           <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground">
-              Sign in to open your vault
+            <h1 className="text-balance text-[clamp(26px,3vw,32px)] font-bold leading-[1.05] tracking-[-0.05em] text-foreground">
+              Sign in to open{" "}
+              <span className="accent-serif">your vault.</span>
             </h1>
-            <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
+            <p className="max-w-sm text-pretty text-[15px] leading-relaxed text-soft">
               The dashboard is behind one sign-in. Your snippets, tags, and
               privacy settings live on the other side.
             </p>
@@ -61,24 +90,40 @@ export function SignInGate() {
         </div>
 
         <div className="flex w-full flex-col gap-3">
-          <GoogleButton
-            label={pending === "google" ? "Redirecting…" : "Continue with Google"}
-            onClick={() => handleSocial("google")}
-          />
-          <GithubButton
-            label={pending === "github" ? "Redirecting…" : "Continue with GitHub"}
-            onClick={() => handleSocial("github")}
-          />
-          <div className="flex items-center gap-3">
-            <span className="h-px flex-1 bg-border" />
-            <span className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground/60">
-              or
-            </span>
-            <span className="h-px flex-1 bg-border" />
-          </div>
+          {hasSocial && (
+            <>
+              {googleEnabled && (
+                <GoogleButton
+                  label={
+                    pending === "google"
+                      ? "Redirecting…"
+                      : "Continue with Google"
+                  }
+                  onClick={() => handleSocial("google")}
+                />
+              )}
+              {githubEnabled && (
+                <GithubButton
+                  label={
+                    pending === "github"
+                      ? "Redirecting…"
+                      : "Continue with GitHub"
+                  }
+                  onClick={() => handleSocial("github")}
+                />
+              )}
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-line" />
+                <span className="font-rounded text-[11px] font-bold uppercase tracking-[0.14em] text-soft/70">
+                  or
+                </span>
+                <span className="h-px flex-1 bg-line" />
+              </div>
+            </>
+          )}
           <Button
             variant="outline"
-            className="h-11 w-full gap-2 rounded-xl"
+            className="h-12 w-full gap-2 rounded-2xl border-line bg-panel text-[15px] font-semibold text-foreground hover:bg-secondary"
             disabled={busy}
             onClick={handleDemo}
           >
@@ -89,11 +134,16 @@ export function SignInGate() {
             )}
             Continue with a demo account
           </Button>
+          {error && (
+            <p className="text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
         </div>
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex items-center gap-2 text-sm font-medium text-soft transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
           Back to CodeVault
