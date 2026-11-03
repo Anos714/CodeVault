@@ -135,7 +135,7 @@ export function CollectionDetailView({
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   maxLength={60}
-                  className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
                 />
               </label>
               <label
@@ -153,7 +153,7 @@ export function CollectionDetailView({
                   onChange={(event) => setDescription(event.target.value)}
                   maxLength={220}
                   placeholder="What belongs in here?"
-                  className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="h-10 rounded-lg border border-input bg-background/60 px-3 font-sans text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
                 />
               </label>
             </div>
@@ -203,7 +203,7 @@ export function CollectionDetailView({
                   value={picked}
                   onChange={(event) => setPicked(event.target.value)}
                   aria-label="Pick a snippet from your vault"
-                  className="h-10 min-w-0 flex-1 rounded-lg border border-input bg-background/60 px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+                  className="h-10 min-w-0 flex-1 rounded-lg border border-input bg-background/60 px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
                 >
                   <option value="">Pick from your vault…</option>
                   {candidates.map((candidate) => (

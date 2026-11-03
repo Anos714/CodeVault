@@ -66,7 +66,7 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
                 onClick={() => useUIStore.getState().setSidebarOpen(false)}
                 className={cn(
                   "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors outline-none",
-                  "focus-visible:ring-2 focus-visible:ring-ring/50",
+                  "focus-visible:ring-2 focus-visible:ring-ring/70",
                   active
                     ? "bg-foreground text-background shadow-sm"
                     : "text-soft hover:bg-panel hover:text-foreground",
