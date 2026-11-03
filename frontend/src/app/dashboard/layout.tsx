@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 
+import { CommandPalette } from "@/components/dashboard/command-palette";
 import { Topbar } from "@/components/dashboard/topbar";
 import { SignInGate } from "@/components/dashboard/sign-in-gate";
 import { Sidebar } from "@/components/dashboard/sidebar";
@@ -39,6 +40,8 @@ export default async function DashboardLayout({
         <Topbar />
         <main className="flex-1 px-5 py-6 sm:px-8 sm:py-8">{children}</main>
       </div>
+
+      <CommandPalette />
     </div>
   );
 }

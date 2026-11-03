@@ -29,7 +29,7 @@ export function Hero() {
         </motion.a>
 
         <motion.h1 variants={fadeUp} className="hero-title mt-3">
-          <span className="line">Your code,</span>
+          <span className="line">Your code,</span>{" "}
           <span className="line accent">remembered.</span>
         </motion.h1>
 
@@ -82,7 +82,11 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="inline-flex h-[52px] items-center gap-3 rounded-full bg-gradient-to-b from-[#303030] to-[#171717] px-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_0_0_1px_rgba(255,255,255,0.08),0_20px_40px_-18px_rgba(0,0,0,0.7)]">
+          <Link
+            href="/dashboard"
+            aria-label="Open CodeVault and search your vault"
+            className="inline-flex h-[52px] items-center gap-3 rounded-full bg-gradient-to-b from-[#303030] to-[#171717] px-5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_0_0_1px_rgba(255,255,255,0.08),0_20px_40px_-18px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:-translate-y-0.5"
+          >
             <span className="grid size-8 place-items-center rounded-lg bg-white/12 text-white/85">
               <Search className="size-4" />
             </span>
@@ -97,7 +101,7 @@ export function Hero() {
             <span className="ml-1 rounded-md bg-white/12 px-1.5 py-1 font-mono text-[10px] font-semibold text-white/75">
               ⌘K
             </span>
-          </div>
+          </Link>
         </motion.div>
 
         <motion.a
