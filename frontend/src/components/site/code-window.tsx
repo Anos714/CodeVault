@@ -155,25 +155,25 @@ export function CodeWindow({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-black/20",
+        "relative overflow-hidden rounded-2xl border border-line bg-card shadow-[0_30px_70px_-40px_rgba(11,11,15,0.45)]",
         className,
       )}
     >
       {/* window chrome */}
-      <div className="flex items-center justify-between border-b border-border bg-muted/40 px-3.5 py-2.5">
+      <div className="flex items-center justify-between border-b border-line bg-panel px-4 py-3">
         <div className="flex items-center gap-2">
           <span className="size-2.5 rounded-full bg-syntax-number/70" />
           <span className="size-2.5 rounded-full bg-primary/70" />
           <span className="size-2.5 rounded-full bg-syntax-function/70" />
         </div>
-        <span className="font-mono text-xs text-muted-foreground">
+        <span className="font-rounded text-[12px] font-semibold text-soft">
           {filename}
         </span>
         <button
           type="button"
           onClick={handleCopy}
           aria-label="Copy snippet"
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background/60 px-2 py-1 text-[0.7rem] text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-card px-2 py-1 font-rounded text-[0.7rem] font-semibold text-soft shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_7%,transparent)] transition-colors hover:text-foreground"
         >
           {copied ? (
             <Check className="size-3 text-primary" />
@@ -185,7 +185,7 @@ export function CodeWindow({
       </div>
 
       {/* code body */}
-      <div className="relative bg-background/40 px-2 py-3.5 sm:px-4">
+      <div className="relative bg-card px-2 py-4 sm:px-4">
         <pre className="overflow-x-auto font-mono text-[0.78rem] leading-relaxed sm:text-[0.82rem]">
           <code>
             {lines.map((line, index) => {
@@ -198,7 +198,7 @@ export function CodeWindow({
                 >
                   {showLineNumbers && (
                     <span
-                      className="select-none text-right text-muted-foreground/40 tabular-nums"
+                      className="select-none text-right text-soft/40 tabular-nums"
                       style={{ minWidth: "1.4rem" }}
                     >
                       {index + 1}
