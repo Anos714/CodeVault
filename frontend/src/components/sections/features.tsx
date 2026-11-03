@@ -5,148 +5,162 @@ import type { ComponentType } from "react";
 import { Code2, Copy, Lock, Search, SunMoon, Tag } from "lucide-react";
 import { SectionHeading } from "@/components/site/section-heading";
 import {
-  CopyArt,
-  EditorArt,
-  SearchArt,
-  ShieldArt,
-  TagArt,
-  ThemeArt,
-} from "@/components/site/feature-art";
+  CopyVisual,
+  EditorVisual,
+  PrivacyVisual,
+  SearchVisual,
+  TagsVisual,
+  ThemeVisual,
+} from "@/components/site/feature-visuals";
 import { fadeUp, staggerContainer, inViewProps } from "@/lib/motion";
 import { cn } from "@/lib/utils";
-
-type Accent = {
-  /** accent text color */
-  text: string;
-  /** soft tint behind the art */
-  tint: string;
-  /** hover border color */
-  border: string;
-  /** glow blob color */
-  glow: string;
-  /** gradient line color */
-  line: string;
-};
-
-const accents: Record<string, Accent> = {
-  primary: {
-    text: "text-primary",
-    tint: "bg-primary/[0.06]",
-    border: "group-hover:border-primary/40",
-    glow: "bg-primary/25",
-    line: "via-primary",
-  },
-  function: {
-    text: "text-syntax-function",
-    tint: "bg-syntax-function/[0.06]",
-    border: "group-hover:border-syntax-function/40",
-    glow: "bg-syntax-function/25",
-    line: "via-syntax-function",
-  },
-  keyword: {
-    text: "text-syntax-keyword",
-    tint: "bg-syntax-keyword/[0.06]",
-    border: "group-hover:border-syntax-keyword/40",
-    glow: "bg-syntax-keyword/25",
-    line: "via-syntax-keyword",
-  },
-  string: {
-    text: "text-syntax-string",
-    tint: "bg-syntax-string/[0.06]",
-    border: "group-hover:border-syntax-string/40",
-    glow: "bg-syntax-string/25",
-    line: "via-syntax-string",
-  },
-  number: {
-    text: "text-syntax-number",
-    tint: "bg-syntax-number/[0.06]",
-    border: "group-hover:border-syntax-number/40",
-    glow: "bg-syntax-number/25",
-    line: "via-syntax-number",
-  },
-};
 
 type Feature = {
   title: string;
   description: string;
-  art: ComponentType;
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  visual: ComponentType;
+  icon: ComponentType<{ className?: string; strokeWidth?: number }>;
   iconLabel: string;
-  accent: Accent;
+  chip: string;
   span: string;
 };
 
 const features: Feature[] = [
   {
-    title: "A Monaco editor, in your browser",
+    title: "A real editor, in your browser",
     description:
       "The same engine that powers VS Code — real syntax highlighting, indentation, and instant language switching.",
-    art: EditorArt,
+    visual: EditorVisual,
     icon: Code2,
     iconLabel: "Editor",
-    accent: accents.function,
-    span: "sm:col-span-2 md:col-span-4",
+    chip: "bg-sky/70 text-ink",
+    span: "sm:col-span-2 lg:col-span-4",
   },
   {
     title: "Search that actually finds it",
     description: "Match on title, language, description, or tags.",
-    art: SearchArt,
+    visual: SearchVisual,
     icon: Search,
     iconLabel: "Search",
-    accent: accents.primary,
-    span: "md:col-span-2",
+    chip: "bg-butter/80 text-ink",
+    span: "sm:col-span-2 lg:col-span-2",
   },
   {
     title: "Tags, not folders",
     description: "Organize flat and fast with #tags that travel with your code.",
-    art: TagArt,
+    visual: TagsVisual,
     icon: Tag,
     iconLabel: "Tags",
-    accent: accents.keyword,
-    span: "md:col-span-2",
+    chip: "bg-blush/60 text-ink",
+    span: "lg:col-span-2",
   },
   {
     title: "Private by default",
     description: "Keep snippets to yourself, or flip one switch to share.",
-    art: ShieldArt,
+    visual: PrivacyVisual,
     icon: Lock,
     iconLabel: "Privacy",
-    accent: accents.number,
-    span: "md:col-span-4",
+    chip: "bg-aqua/70 text-ink",
+    span: "lg:col-span-2",
   },
   {
     title: "Copy, don't rewrite",
-    description: "One click and the snippet is on your clipboard, ready to ship.",
-    art: CopyArt,
+    description: "One click and it's on your clipboard — ready to ship.",
+    visual: CopyVisual,
     icon: Copy,
     iconLabel: "Copy",
-    accent: accents.string,
-    span: "md:col-span-2",
+    chip: "bg-periwinkle/70 text-ink",
+    span: "lg:col-span-2",
   },
   {
     title: "Calm by day, focused by night",
     description:
       "A quiet light theme and a deep dark one — both tuned for long reading sessions.",
-    art: ThemeArt,
+    visual: ThemeVisual,
     icon: SunMoon,
     iconLabel: "Themes",
-    accent: accents.primary,
-    span: "sm:col-span-2 md:col-span-4",
+    chip: "bg-success/15 text-success",
+    span: "sm:col-span-2 lg:col-span-6",
   },
 ];
 
+function FeatureCard({
+  title,
+  description,
+  visual: Visual,
+  icon: Icon,
+  iconLabel,
+  chip,
+  span,
+  wide = false,
+}: Feature & { wide?: boolean }) {
+  return (
+    <motion.article
+      variants={fadeUp}
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 26 }}
+      className={cn(
+        "group relative flex h-full flex-col overflow-hidden rounded-[30px] bg-panel p-5 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_5%,transparent)] transition-shadow duration-300 hover:shadow-[0_30px_60px_-40px_color-mix(in_srgb,var(--foreground)_45%,transparent)] sm:p-6",
+        span,
+      )}
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-white/60 to-transparent opacity-70 dark:from-white/[0.04]"
+      />
+
+      <div
+        className={cn(
+          "relative",
+          wide
+            ? "flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8"
+            : "flex flex-1 flex-col",
+        )}
+      >
+        <div className={cn("relative", wide ? "flex-1 lg:order-2" : "flex-1")}>
+          <Visual />
+        </div>
+
+        <div
+          className={cn(
+            "relative mt-6",
+            wide && "lg:mt-0 lg:w-[38%] lg:shrink-0",
+          )}
+        >
+          <div className="mb-3 flex items-center gap-2.5">
+            <span
+              className={cn(
+                "flex size-8 shrink-0 items-center justify-center rounded-xl",
+                chip,
+              )}
+            >
+              <Icon className="size-4" strokeWidth={2} />
+            </span>
+            <span className="font-rounded text-[11px] font-bold uppercase tracking-[0.14em] text-soft">
+              {iconLabel}
+            </span>
+          </div>
+
+          <h3 className="mb-1.5 text-[21px] font-[650] leading-[1.15] tracking-[-0.03em] text-foreground">
+            {title}
+          </h3>
+          <p className="text-[15px] leading-relaxed text-soft">{description}</p>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
 export function Features() {
   return (
-    <section id="features" className="relative py-20 sm:py-28">
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-dots mask-fade opacity-50" />
-
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+    <section id="features" className="relative scroll-mt-24 py-[84px] sm:py-[120px]">
+      <div className="wrap">
         <SectionHeading
           eyebrow="Features"
           title={
             <>
               Everything you need.{" "}
-              <span className="text-primary">Nothing you don&apos;t.</span>
+              <span className="accent-serif">Nothing you don&apos;t.</span>
             </>
           }
           description="CodeVault does one job extremely well — it keeps your code findable."
@@ -155,75 +169,11 @@ export function Features() {
         <motion.div
           variants={staggerContainer(0.08)}
           {...inViewProps}
-          className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-6"
+          className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6"
         >
-          {features.map(
-            ({ title, description, art: Art, icon: Icon, iconLabel, accent, span }) => (
-              <motion.div
-                key={title}
-                variants={fadeUp}
-                whileHover={{ y: -4 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className={cn(
-                  "group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card/50 p-5 transition-colors",
-                  accent.border,
-                  "hover:bg-card",
-                  span,
-                )}
-              >
-                {/* accent glow */}
-                <div
-                  aria-hidden
-                  className={cn(
-                    "pointer-events-none absolute -right-10 -top-10 size-32 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100",
-                    accent.glow,
-                  )}
-                />
-
-                {/* top accent line on hover */}
-                <div
-                  aria-hidden
-                  className={cn(
-                    "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100",
-                    accent.line,
-                  )}
-                />
-
-                <div
-                  className={cn(
-                    "relative mb-5 flex h-24 items-center justify-center overflow-hidden rounded-xl border border-border",
-                    accent.tint,
-                  )}
-                >
-                  <div className="pointer-events-none absolute inset-0 bg-grid opacity-40" />
-                  <div className="relative h-full w-full p-3">
-                    <Art />
-                  </div>
-                </div>
-
-                <div className="mb-2 flex items-center gap-2.5">
-                  <span
-                    className={cn(
-                      "flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60",
-                      accent.text,
-                    )}
-                  >
-                    <Icon className="size-4" strokeWidth={1.9} />
-                  </span>
-                  <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground/70">
-                    {iconLabel}
-                  </span>
-                </div>
-
-                <h3 className="mb-1.5 text-[1.02rem] font-semibold tracking-tight text-foreground">
-                  {title}
-                </h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {description}
-                </p>
-              </motion.div>
-            ),
-          )}
+          {features.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} wide={feature.span.endsWith("col-span-6")} />
+          ))}
         </motion.div>
       </div>
     </section>
