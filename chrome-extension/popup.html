@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CodeVault</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="popup">
+    <header class="brand">
+      <div class="logo" aria-hidden="true">CV</div>
+      <div>
+        <h1>CodeVault</h1>
+        <p class="account" id="account">Not connected</p>
+      </div>
+      <span class="spacer"></span>
+      <button class="button icon ghost" id="settings" title="Settings" type="button">⚙</button>
+    </header>
+
+    <main>
+      <section id="connect-panel" class="stack hidden">
+        <p class="help" id="connect-message">
+          Connect your CodeVault account to save selections and search your
+          snippets from any page.
+        </p>
+        <button class="button primary" id="connect-button" type="button">
+          Open settings
+        </button>
+      </section>
+
+      <section id="vault-panel" class="hidden">
+        <div class="actions">
+          <button class="button primary grow" id="save-selection" type="button">
+            Save selection
+          </button>
+          <button class="button" id="open-vault" type="button">Vault</button>
+        </div>
+
+        <label class="field search">
+          Search
+          <input
+            id="search"
+            type="search"
+            placeholder="Search titles, code, tags…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+
+        <p class="status" id="status" role="status"></p>
+        <ul class="snippets" id="snippets"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="dist/popup.js"></script>
+  </body>
+</html>

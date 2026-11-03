@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CodeVault settings</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page">
+    <div class="page-shell">
+      <header class="brand" style="border: 1px solid var(--border); border-radius: 14px; margin-bottom: 20px">
+        <div class="logo" aria-hidden="true">CV</div>
+        <div>
+          <h1>CodeVault</h1>
+          <p class="account">Chrome extension settings</p>
+        </div>
+      </header>
+
+      <h2>Connect your account</h2>
+      <p class="lede">
+        Create a personal access token in CodeVault, then paste it here. The
+        token stays on this device in <code>chrome.storage.local</code>.
+      </p>
+
+      <form class="panel stack" id="settings-form">
+        <label class="field">
+          CodeVault URL
+          <input id="base-url" type="url" placeholder="http://localhost:3000" required />
+        </label>
+
+        <label class="field">
+          Personal access token
+          <input
+            id="token"
+            type="password"
+            placeholder="cv_pat_…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </label>
+
+        <label class="field">
+          Default visibility for new snippets
+          <select id="default-visibility">
+            <option value="private">Private</option>
+            <option value="public">Public</option>
+          </select>
+        </label>
+
+        <p class="help">
+          Don't have a token?
+          <a id="create-token-link" href="#" target="_blank" rel="noopener noreferrer">
+            Open CodeVault settings
+          </a>
+          and create one under <strong>API tokens</strong>.
+        </p>
+
+        <div class="row wrap">
+          <button class="button primary" id="save" type="submit">Save &amp; connect</button>
+          <button class="button" id="test" type="button">Test connection</button>
+          <button class="button danger" id="disconnect" type="button">Disconnect</button>
+        </div>
+
+        <p class="status" id="status" role="status"></p>
+      </form>
+
+      <div class="divider"></div>
+
+      <p class="help">
+        Local development: run <code>bun run dev</code> in <code>frontend/</code>,
+        keep the URL at <code>http://localhost:3000</code>, and load this folder
+        unpacked from <code>chrome://extensions</code>. Tokens grant full access
+        to your vault — revoke one from CodeVault settings at any time.
+      </p>
+    </div>
+
+    <script type="module" src="dist/options.js"></script>
+  </body>
+</html>

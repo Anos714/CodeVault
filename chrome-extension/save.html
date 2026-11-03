@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Save to CodeVault</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="page">
+    <div class="page-shell" style="padding: 18px">
+      <header class="brand" style="border: 1px solid var(--border); border-radius: 14px; margin-bottom: 16px">
+        <div class="logo" aria-hidden="true">CV</div>
+        <div>
+          <h1>Save to CodeVault</h1>
+          <p class="account" id="source">—</p>
+        </div>
+      </header>
+
+      <div class="stack" id="save-panel">
+        <label class="field">
+          Title
+          <input id="title" type="text" maxlength="80" required />
+        </label>
+
+        <div class="grid">
+          <label class="field">
+            Language
+            <select id="language"></select>
+          </label>
+          <label class="field">
+            Visibility
+            <select id="visibility">
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="field">
+          Tags <span style="text-transform: none">(comma separated, max 5)</span>
+          <input id="tags" type="text" placeholder="hooks, typescript" />
+        </label>
+
+        <label class="field">
+          Code
+          <textarea id="code" spellcheck="false"></textarea>
+        </label>
+
+        <div class="row wrap">
+          <button class="button primary" id="save" type="button">Save snippet</button>
+          <button class="button" id="cancel" type="button">Cancel</button>
+        </div>
+
+        <p class="status" id="status" role="status"></p>
+      </div>
+
+      <div class="panel stack hidden" id="success-panel">
+        <p class="notice" id="success-message">Saved to your vault.</p>
+        <div class="row wrap">
+          <button class="button primary" id="open-snippet" type="button">Open snippet</button>
+          <button class="button" id="close" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="dist/save.js"></script>
+  </body>
+</html>

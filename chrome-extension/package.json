@@ -1,0 +1,25 @@
+{
+  "name": "codevault-chrome-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Save and search CodeVault snippets from any page.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/chrome": "^0.1.28",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vitest": "^5.1.0"
+  }
+}

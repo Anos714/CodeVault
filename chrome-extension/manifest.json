@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "CodeVault",
+  "version": "0.1.0",
+  "description": "Save selections and search your CodeVault snippets without leaving the page.",
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*", "https://*/*"],
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "CodeVault",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "commands": {
+    "save-selection": {
+      "suggested_key": {
+        "default": "Alt+Shift+S"
+      },
+      "description": "Save the current selection to CodeVault"
+    }
+  }
+}
