@@ -86,8 +86,21 @@ export function AuthSplit({ children }: AuthSplitProps) {
       </div>
 
       {/* ---------- form panel ---------- */}
-      <div className="relative flex items-center justify-center bg-background px-5 py-16 sm:px-10">
+      <div className="relative flex flex-col items-center justify-center bg-background px-5 py-16 sm:px-10">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dots mask-fade opacity-25 lg:hidden" />
+
+        {/* the brand panel is lg-only, so narrow screens need their own way back */}
+        <div className="absolute inset-x-5 top-6 flex items-center justify-between lg:hidden">
+          <Logo className="text-foreground" markClassName="size-8" />
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Back
+          </Link>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
