@@ -30,6 +30,9 @@ import { easeOutExpo } from "@/lib/motion";
 import { useBrowserOrigin } from "@/lib/client-hooks";
 import type { Snippet } from "@/lib/snippet-types";
 
+/** `copied` keys off a token; the embed row is not a link, so it gets its own */
+const EMBED = "__embed__";
+
 type ShareDialogProps = {
   snippet: Snippet;
   open: boolean;
@@ -46,6 +49,7 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
   const [justMinted, setJustMinted] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const origin = useBrowserOrigin();
+  const embedMarkup = `<iframe src="${origin}/embed/${snippet.id}" width="100%" height="320" />`;
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // Escape closes; focus moves into the dialog and returns to the trigger.
@@ -295,12 +299,28 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
               </div>
             )}
 
-            <p className="border-t border-border pt-4 font-mono text-[0.68rem] leading-relaxed text-muted-foreground/60">
-              Embed it in a README:{" "}
-              <code className="text-foreground/80">
-                {`<iframe src="${typeof window !== "undefined" ? window.location.origin : "https://codevault-olive.vercel.app"}/embed/${snippet.id}" …/>`}
-              </code>
-            </p>
+            <div className="flex flex-col gap-2 border-t border-border pt-4">
+              <span className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted-foreground/70">
+                Embed in a README
+              </span>
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 p-2">
+                <code className="min-w-0 flex-1 truncate font-mono text-[0.68rem] text-foreground/80">
+                  {embedMarkup}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(embedMarkup, EMBED)}
+                  aria-label="Copy embed code"
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {copied === EMBED ? (
+                    <Check className="size-3.5 text-primary" />
+                  ) : (
+                    <Copy className="size-3.5" />
+                  )}
+                </button>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
       )}
