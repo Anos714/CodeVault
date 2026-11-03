@@ -43,6 +43,7 @@ Sign in with Google, GitHub, or one click as the demo account. Everything saves 
 -   **Unlisted share links** — mint 32-hex token links (`/s/[token]`) that never expire or expire in 1/7/30 days, revoke them all in one click. Private code stays private: links are looked up by primary key and re-checked for revocation and expiry on every read.
 -   **Embeds & social previews** — chrome-free `/embed/[id]` iframe payloads for READMEs and Notion, plus generated 1200×630 OG cards so a pasted link unfurls as a title, language chip and code peek.
 -   **Auth that degrades gracefully** — Google and GitHub OAuth plus a seeded demo account behind one click. Missing OAuth secrets? The provider is skipped and the demo keeps working. No database? The build still passes; pages stay dynamic.
+-   **Token API + first-party extensions** — a `/api/v1` REST API with SHA-256-hashed personal access tokens powers a Manifest V3 Chrome extension and a VS Code extension. Both run locally, store the token on-device, and share the same typed client contract.
 -   **Privacy with an opinion** — a "new snippets default to private" preference travels from settings into the composer. Share by choice, not by accident.
 
 ## Screenshots
@@ -160,6 +161,10 @@ frontend/
       auth/page.tsx               Sign-in (Google / GitHub / demo)
       api/auth/[...all]/route.ts  Better Auth handler
       api/auth/demo/route.ts      POST — demo credential sign-in, forwards Set-Cookie
+      api/v1/                     REST API for the Chrome/VS Code extensions
+        me/route.ts               GET — account behind a bearer token
+        snippets/                 GET/POST list/create; [id] GET/PATCH/DELETE
+        tokens/                   GET/POST list/create; [id] DELETE (cookie session)
       dashboard/
         page.tsx                  Overview (server: stats + recent via DAL)
         snippets/                 Vault list (URL-driven filters), detail, edit
@@ -174,6 +179,8 @@ frontend/
       queries.ts                  DAL — every read, store-compatible shapes + starred
       actions/snippets.ts         create/update/delete/favorite/fork/copies
       actions/share.ts            mint/revoke share links
+      actions/tokens.ts           create/list/revoke personal access tokens
+      api/                        /api/v1 auth, token verification, HTTP helpers
       db/schema.ts                Auth + app tables (drizzle migration source)
       db/index.ts                 Lazy neon-http client (build-safe without a DB)
     lib/                          share/languages/templates/seed-data/highlight/…
@@ -185,6 +192,8 @@ frontend/
   scripts/seed.ts                 Idempotent demo seed
   scripts/drizzle.mjs             Runs drizzle-kit under Node with .env.local preloaded
   .env.example                    Annotated template (the only tracked .env file)
+chrome-extension/                 Manifest V3 extension (own package.json, tests, build)
+vscode-extension/                 VS Code extension (own package.json, tests, build)
 docs/                             Architecture notes (working spec, git-ignored)
 ```
 
@@ -201,9 +210,13 @@ docs/                             Architecture notes (working spec, git-ignored)
 | `/dashboard/new` | Create composer with live preview and templates |
 | `/dashboard/explore` | Public feed (`?q&starred=1`) |
 | `/dashboard/tags` | Tag cloud plus languages-you-use grid |
-| `/dashboard/settings` | Profile, default privacy, sign-out |
+| `/dashboard/settings` | Profile, default privacy, API tokens, sign-out |
 | `/s/[token]` | Unlisted share page (usable link first, public id fallback) |
 | `/embed/[id]` | Iframe payload (public, or owner) |
+| `/api/v1` | REST API for the Chrome/VS Code extensions (bearer token) |
+| `/api/v1/snippets` | List/search/create the caller's snippets |
+| `/api/v1/snippets/[id]` | Read/update/delete one snippet |
+| `/api/v1/tokens` | Create/list/revoke personal access tokens (cookie session) |
 | `/api/auth/[...all]` | Better Auth — sign-in, callback, session, sign-out |
 | `/api/auth/demo` | `POST` — demo sign-in |
 | `/privacy-policy`, `/terms-and-conditions` | Static legal pages |
@@ -227,7 +240,8 @@ Deep dive: `docs/Architecture.md` (working spec, git-ignored).
 | -------- | ------------ |
 | [`frontend/.env.example`](frontend/.env.example) | Every environment variable, annotated |
 | [`docs/architecture.md`](docs/architecture.md) | Mental model, rendering split, DAL, actions, auth, security model |
-| [`docs/api.md`](docs/api.md) | Every server action, DAL query and auth route: inputs, returns, status codes |
+| [`docs/api.md`](docs/api.md) | Every server action, DAL query, REST endpoint and auth route: inputs, returns, status codes |
+| [`docs/extensions.md`](docs/extensions.md) | Chrome + VS Code clients: token setup, local run, verification, security |
 | [`docs/deployment.md`](docs/deployment.md) | Production env setup, OAuth callbacks, degradation matrix, checklists |
 | [`frontend/drizzle/`](frontend/drizzle/) | The applied migrations — the schema's reviewable history |
 
