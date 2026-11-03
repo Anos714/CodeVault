@@ -28,6 +28,9 @@ export function StatsRow({ stats }: { stats: Stat[] }) {
             <span
               className={cn(
                 "flex size-9 shrink-0 items-center justify-center rounded-xl bg-white shadow-[inset_0_0_0_1px_rgba(11,11,15,0.06)]",
+                // the chip inverts in dark mode: a white disc would both glare
+                // and swallow the light accent colours the icons use
+                "dark:bg-ink/10 dark:shadow-[inset_0_0_0_1px_var(--line)]",
                 accent,
               )}
             >
