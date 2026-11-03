@@ -29,6 +29,9 @@ type SnippetsViewProps = {
   initialCursor: string | null;
 };
 
+/** a vault can carry hundreds of tags; the row shows the busiest ones first */
+const TAG_PREVIEW_COUNT = 10;
+
 const sortOptions: { label: string; value: SnippetFilters["sort"] }[] = [
   { label: "Recently updated", value: "updated" },
   { label: "Newest", value: "created" },
@@ -65,6 +68,16 @@ export function SnippetsView({ snippets: initial, tags, total, filters, initialC
   const [items, setItems] = useState(initial);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
+
+  // the active tag stays reachable even when it falls outside the preview
+  const previewTags = tags.slice(0, TAG_PREVIEW_COUNT);
+  const visibleTags =
+    showAllTags || tags.length <= TAG_PREVIEW_COUNT
+      ? tags
+      : filters.tag && !previewTags.includes(filters.tag)
+        ? [filters.tag, ...previewTags]
+        : previewTags;
 
   const replace = (next: SnippetFilters) => {
     router.replace(toQueryString(next), { scroll: false });
@@ -145,7 +158,7 @@ export function SnippetsView({ snippets: initial, tags, total, filters, initialC
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search title, language, or tag…"
             aria-label="Search snippets"
-            className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+            className="h-10 w-full rounded-lg border border-input bg-background/60 pl-10 pr-10 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
           />
           {query && (
             <button
@@ -190,7 +203,7 @@ export function SnippetsView({ snippets: initial, tags, total, filters, initialC
 
           <span aria-hidden className="mx-1 h-5 w-px bg-border" />
 
-          {tags.map((tag) => (
+          {visibleTags.map((tag) => (
             <button
               key={tag}
               type="button"
@@ -206,6 +219,16 @@ export function SnippetsView({ snippets: initial, tags, total, filters, initialC
               #{tag}
             </button>
           ))}
+
+          {tags.length > TAG_PREVIEW_COUNT && (
+            <button
+              type="button"
+              onClick={() => setShowAllTags((value) => !value)}
+              className="rounded-full px-2 py-1 font-mono text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+            >
+              {showAllTags ? "show fewer" : `show all ${tags.length - previewTags.length} more`}
+            </button>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
@@ -225,7 +248,7 @@ export function SnippetsView({ snippets: initial, tags, total, filters, initialC
               onChange={(event) =>
                 replace({ ...filters, sort: event.target.value as SnippetFilters["sort"] })
               }
-              className="h-8 rounded-lg border border-input bg-background/60 px-2.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="h-8 rounded-lg border border-input bg-background/60 px-2.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/70"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>
