@@ -1,53 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { Tag, Search, Wand2 } from "lucide-react";
 import { CodeWindow } from "@/components/site/code-window";
 import { SectionHeading } from "@/components/site/section-heading";
 import { demoSnippets, type DemoLanguage } from "@/lib/snippets";
 import { useUIStore } from "@/store/ui.store";
 import { cn } from "@/lib/utils";
-import {
-  fadeUp,
-  staggerContainer,
-  inViewProps,
-  easeOutExpo,
-} from "@/lib/motion";
+import { easeOutExpo } from "@/lib/motion";
 
 const languages: DemoLanguage[] = ["javascript", "typescript", "python"];
-
-const steps = [
-  {
-    icon: Wand2,
-    number: "01",
-    title: "Write or paste",
-    description:
-      "A Monaco-grade editor with the syntax you already love — indentation, highlighting, the works.",
-    label: "text-syntax-function",
-    chip: "bg-sky/70 text-ink",
-    glow: "from-sky/50",
-  },
-  {
-    icon: Tag,
-    number: "02",
-    title: "Tag & organize",
-    description:
-      "Group snippets with tags like #auth or #regex. Make them public to share, or keep them private.",
-    label: "text-syntax-keyword",
-    chip: "bg-blush/60 text-ink",
-    glow: "from-blush/45",
-  },
-  {
-    icon: Search,
-    number: "03",
-    title: "Search & reuse",
-    description:
-      "Find anything by title, language, or tag. Copy it in one click and ship. Never rewrite it again.",
-    label: "text-syntax-string",
-    chip: "bg-butter/80 text-ink",
-    glow: "from-butter/55",
-  },
-];
 
 export function CodeDemo() {
   const activeDemoLanguage = useUIStore((s) => s.activeDemoLanguage);
@@ -147,62 +108,6 @@ export function CodeDemo() {
               Try it — this is the real editor behaviour.
             </p>
           </div>
-        </motion.div>
-
-        <motion.div
-          variants={staggerContainer(0.12)}
-          {...inViewProps}
-          className="mt-14 grid grid-cols-1 gap-4 md:grid-cols-3"
-        >
-          {steps.map(
-            ({ icon: Icon, number, title, description, label, chip, glow }) => (
-              <motion.div
-                key={title}
-                variants={fadeUp}
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 300, damping: 26 }}
-                className="group relative overflow-hidden rounded-[28px] bg-panel p-7 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_5%,transparent)] transition-shadow duration-300 hover:shadow-[0_28px_50px_-36px_color-mix(in_srgb,var(--foreground)_40%,transparent)]"
-              >
-                <div
-                  aria-hidden
-                  className={cn(
-                    "pointer-events-none absolute -right-12 -top-12 size-36 rounded-full bg-gradient-to-br to-transparent opacity-60 blur-2xl transition-opacity duration-500 group-hover:opacity-100",
-                    glow,
-                  )}
-                />
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute right-6 top-4 font-rounded text-[46px] font-black leading-none tracking-[-0.06em] text-ink/[0.055]"
-                >
-                  {number}
-                </span>
-
-                <div
-                  className={cn(
-                    "relative mb-5 flex size-11 items-center justify-center rounded-2xl",
-                    chip,
-                  )}
-                >
-                  <Icon className="size-5" strokeWidth={2} />
-                </div>
-
-                <span
-                  className={cn(
-                    "relative font-rounded text-[12px] font-bold uppercase tracking-[0.14em]",
-                    label,
-                  )}
-                >
-                  Step {number}
-                </span>
-                <h3 className="relative mb-2 mt-1 text-[22px] font-[650] tracking-[-0.03em] text-foreground">
-                  {title}
-                </h3>
-                <p className="relative text-[16px] leading-relaxed text-soft">
-                  {description}
-                </p>
-              </motion.div>
-            ),
-          )}
         </motion.div>
       </div>
     </section>
