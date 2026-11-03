@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "db:generate": "node scripts/drizzle.mjs generate",
     "db:migrate": "node scripts/drizzle.mjs migrate",
     "db:push": "node scripts/drizzle.mjs push",
