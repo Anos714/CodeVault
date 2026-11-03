@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    name: Typecheck, lint, build, schema drift
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      # The build must succeed with no database configured — pages stay
+      # dynamic and reads fail closed at runtime.
+      - name: Build (no database)
+        run: DATABASE_URL="" bun run build
+
+      # Drift gate: generating against the committed schema must produce no
+      # new migration. A dirty tree means the schema and drizzle/ disagree.
+      - name: Schema drift
+        env:
+          DATABASE_URL: postgres://user:pass@localhost:5432/codevault
+        run: |
+          bun run db:generate
+          git diff --exit-code -- drizzle
+
+  extensions:
+    name: ${{ matrix.extension }} — typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        extension: [chrome-extension, vscode-extension]
+    defaults:
+      run:
+        working-directory: ${{ matrix.extension }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck, lint, unit tests, build
+        run: bun run check
