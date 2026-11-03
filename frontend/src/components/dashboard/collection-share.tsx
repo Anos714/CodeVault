@@ -16,13 +16,12 @@ import {
 import { expiryLabel } from "@/lib/share";
 import type { ShareLink } from "@/lib/snippet-types";
 import { cn } from "@/lib/utils";
+import { useBrowserOrigin } from "@/lib/client-hooks";
 
-function collectionUrl(token: string): string {
-  const base =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "https://codevault-olive.vercel.app";
-  return `${base}/c/${token}`;
+/** Relative until the browser origin is known, so SSR and the first client
+ *  render agree (no hydration mismatch on the link text). */
+function collectionUrl(token: string, origin: string): string {
+  return `${origin}/c/${token}`;
 }
 
 type CollectionShareProps = {
@@ -39,6 +38,7 @@ export function CollectionShare({ collectionId, links }: CollectionShareProps) {
   const [expiry, setExpiry] = useState<ShareExpiryDays>(null);
   const [justMinted, setJustMinted] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const origin = useBrowserOrigin();
 
   const handleMint = async () => {
     try {
@@ -80,8 +80,9 @@ export function CollectionShare({ collectionId, links }: CollectionShareProps) {
           Share this folder
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Unlisted links open the whole collection — members included, even
-          private ones. Revoking kills every link at once.
+          Unlisted links open the whole collection — including your own
+          private snippets. Snippets curated from other authors only appear
+          while they stay public. Revoking kills every link at once.
         </p>
       </div>
 
@@ -126,7 +127,7 @@ export function CollectionShare({ collectionId, links }: CollectionShareProps) {
               .slice()
               .reverse()
               .map((link) => {
-                const url = collectionUrl(link.token);
+                const url = collectionUrl(link.token, origin);
                 const isNew = link.token === justMinted;
                 return (
                   <li

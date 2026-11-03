@@ -13,6 +13,8 @@ import { getPublicSnippetById, resolveShareToken } from "@/server/queries";
 export const metadata: Metadata = {
   title: "Shared snippet",
   description: "A CodeVault snippet shared with you.",
+  // unlisted by design — never let a crawler index a share token
+  robots: { index: false, follow: false },
 };
 
 type SharePageProps = {
@@ -81,7 +83,10 @@ export default async function SharePage({ params }: SharePageProps) {
           )}
         </div>
 
-        <SharedCodeBlock snippet={snippet} />
+        <SharedCodeBlock
+          snippet={snippet}
+          token={isUnlisted ? token : undefined}
+        />
 
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-5 font-mono text-xs text-muted-foreground">
           <span>by {snippet.authorName}</span>
@@ -101,14 +106,17 @@ export default async function SharePage({ params }: SharePageProps) {
  */
 export function SharedCodeBlock({
   snippet,
+  token,
 }: {
   snippet: Snippet;
+  /** unlisted token, when this view came from one — lets the copy count */
+  token?: string;
 }) {
   const highlighted = highlightToHtml(snippet.code);
   const lineCount = snippet.code.split("\n").length;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card/60 shadow-2xl shadow-black/20">
+    <div className="overflow-hidden rounded-[24px] border border-line bg-card shadow-[0_30px_70px_-40px_rgba(11,11,15,0.4)]">
       <div className="flex items-center gap-3 border-b border-border bg-muted/40 px-4 py-2.5">
         <span className="flex gap-1.5">
           <span className="size-2.5 rounded-full bg-syntax-number/70" />
@@ -118,7 +126,11 @@ export function SharedCodeBlock({
         <span className="font-mono text-xs text-muted-foreground">
           {snippet.language} · {lineCount} lines
         </span>
-        <CopyCodeButton code={snippet.code} />
+        <CopyCodeButton
+          code={snippet.code}
+          snippetId={snippet.id}
+          token={token}
+        />
       </div>
       <pre className="overflow-x-auto px-4 py-4 font-mono text-[0.8rem] leading-relaxed">
         <code dangerouslySetInnerHTML={{ __html: highlighted }} />

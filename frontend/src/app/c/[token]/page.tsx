@@ -10,6 +10,8 @@ import { resolveCollectionToken } from "@/server/queries";
 export const metadata: Metadata = {
   title: "Shared collection",
   description: "A CodeVault collection shared with you.",
+  // unlisted by design — never let a crawler index a collection token
+  robots: { index: false, follow: false },
 };
 
 type CollectionSharePageProps = {
@@ -17,8 +19,9 @@ type CollectionSharePageProps = {
 };
 
 /**
- * Public folder view behind an unlisted link — no session required, the
- * token authorizes the full member list including private snippets.
+ * Public folder view behind an unlisted link — no session required. The
+ * token authorizes the owner's own private snippets; snippets curated from
+ * other authors only appear while they remain public.
  */
 export default async function CollectionSharePage({
   params,
@@ -70,6 +73,7 @@ export default async function CollectionSharePage({
                 snippet={snippet}
                 showAuthor
                 index={index}
+                readOnly
               />
             ))}
           </div>

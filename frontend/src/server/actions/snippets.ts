@@ -17,9 +17,15 @@ import { revalidatePath } from "next/cache";
 import { and, eq, sql } from "drizzle-orm";
 
 import { auth } from "@/server/auth";
-import { checkLimit } from "@/server/ratelimit";
+import { checkLimit, clientIp } from "@/server/ratelimit";
 import { db } from "@/server/db";
-import { favorites, snippetTags, snippets, user } from "@/server/db/schema";
+import {
+  favorites,
+  shareLinks,
+  snippetTags,
+  snippets,
+  user,
+} from "@/server/db/schema";
 import {
   createSnippetSchema,
   snippetIdSchema,
@@ -174,39 +180,40 @@ export async function toggleFavorite(
     throw new Error("Forbidden");
   }
 
-  const [existing] = await db
-    .select({ snippetId: favorites.snippetId })
-    .from(favorites)
+  // Atomic toggle: the insert tells us whether the favorite was absent. A
+  // concurrent second call conflicts (no row returned) and falls through to
+  // the delete path, so the counter always tracks the actual row.
+  const [inserted] = await db
+    .insert(favorites)
+    .values({ userId: actor.id, snippetId })
+    .onConflictDoNothing()
+    .returning({ snippetId: favorites.snippetId });
+
+  if (inserted) {
+    await db
+      .update(snippets)
+      .set({ favorites: sql`${snippets.favorites} + 1` })
+      .where(eq(snippets.id, snippetId));
+    revalidateVault(snippetId);
+    return { favorited: true };
+  }
+
+  const [removed] = await db
+    .delete(favorites)
     .where(
       and(eq(favorites.userId, actor.id), eq(favorites.snippetId, snippetId)),
     )
-    .limit(1);
+    .returning({ snippetId: favorites.snippetId });
 
-  if (existing) {
-    await db
-      .delete(favorites)
-      .where(
-        and(eq(favorites.userId, actor.id), eq(favorites.snippetId, snippetId)),
-      );
+  if (removed) {
     await db
       .update(snippets)
       .set({ favorites: sql`GREATEST(${snippets.favorites} - 1, 0)` })
       .where(eq(snippets.id, snippetId));
-    revalidateVault(snippetId);
-    return { favorited: false };
   }
 
-  await db
-    .insert(favorites)
-    .values({ userId: actor.id, snippetId })
-    .onConflictDoNothing();
-  await db
-    .update(snippets)
-    .set({ favorites: sql`${snippets.favorites} + 1` })
-    .where(eq(snippets.id, snippetId));
-
   revalidateVault(snippetId);
-  return { favorited: true };
+  return { favorited: false };
 }
 
 /* ------------------------------------------------------------------ *
@@ -287,6 +294,68 @@ export async function incrementCopies(id: unknown): Promise<{ ok: true }> {
   if (!target) throw new Error("Snippet not found.");
   if (target.visibility !== "public" && target.authorId !== actor.id) {
     throw new Error("Forbidden");
+  }
+
+  await db
+    .update(snippets)
+    .set({ copies: sql`${snippets.copies} + 1` })
+    .where(eq(snippets.id, snippetId));
+
+  revalidatePath(`/dashboard/snippets/${snippetId}`);
+  return { ok: true as const };
+}
+
+/**
+ * incrementSharedCopies — public counterpart of incrementCopies for the
+ * read-only /s and /embed surfaces, where there is no session. Public
+ * snippets are always eligible; private ones only when the caller presents
+ * the unlisted token that authorizes them. Rate-limited per IP because the
+ * caller is anonymous.
+ */
+export async function incrementSharedCopies(
+  id: unknown,
+  token?: unknown,
+): Promise<{ ok: true }> {
+  const snippetId = snippetIdSchema.parse(id);
+  const ip = clientIp(await headers());
+  const { ok: allowed } = await checkLimit("share-read", ip);
+  if (!allowed) throw new Error("Slow down — too many changes in a minute.");
+
+  const [target] = await db
+    .select({ visibility: snippets.visibility })
+    .from(snippets)
+    .where(eq(snippets.id, snippetId))
+    .limit(1);
+  if (!target) throw new Error("Snippet not found.");
+
+  if (target.visibility !== "public") {
+    const shareToken =
+      typeof token === "string" && /^[a-f0-9]{32}$/.test(token)
+        ? token
+        : null;
+    if (!shareToken) throw new Error("Forbidden");
+
+    const [link] = await db
+      .select({
+        token: shareLinks.token,
+        revoked: shareLinks.revoked,
+        expiresAt: shareLinks.expiresAt,
+      })
+      .from(shareLinks)
+      .where(
+        and(
+          eq(shareLinks.token, shareToken),
+          eq(shareLinks.snippetId, snippetId),
+        ),
+      )
+      .limit(1);
+    if (
+      !link ||
+      link.revoked ||
+      (link.expiresAt && link.expiresAt.getTime() < Date.now())
+    ) {
+      throw new Error("Forbidden");
+    }
   }
 
   await db

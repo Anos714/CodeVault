@@ -2,17 +2,26 @@
 
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
+import { incrementSharedCopies } from "@/server/actions/snippets";
 
 /**
  * Copy affordance for the read-only share/embed surfaces, where loading the
  * Monaco editor would be overkill. Styled inline so callers don't need a
  * wrapper span.
+ *
+ * `snippetId`/`token` are optional: when present the copy is counted through
+ * the anonymous-safe action. A failed counter (rate limit, revoked link) must
+ * never affect the clipboard interaction.
  */
 export function CopyCodeButton({
   code,
+  snippetId,
+  token,
   className,
 }: {
   code: string;
+  snippetId?: string;
+  token?: string;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -22,6 +31,11 @@ export function CopyCodeButton({
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
+      if (snippetId) {
+        await incrementSharedCopies(snippetId, token).catch(() => {
+          /* counting is best-effort — the copy already succeeded */
+        });
+      }
     } catch {
       /* clipboard unavailable */
     }

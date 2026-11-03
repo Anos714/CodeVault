@@ -15,6 +15,7 @@ import {
 } from "@/server/actions/snippets";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
+import { useHydrated } from "@/lib/client-hooks";
 
 const MAX_PREVIEW_LINES = 6;
 
@@ -28,10 +29,17 @@ function relativeTime(iso: string) {
   if (minutes < 60) return `${minutes}m ago`;
   if (hours < 24) return `${hours}h ago`;
   if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString(undefined, {
+  return formatDate(iso);
+}
+
+/** Deterministic across server and browser: fixed locale and UTC. Used for
+ *  the SSR pass before `mounted` flips, so hydration never disagrees. */
+function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
-  });
+    timeZone: "UTC",
+  }).format(new Date(iso));
 }
 
 type SnippetCardProps = {
@@ -41,6 +49,8 @@ type SnippetCardProps = {
   /** index for the stagger entrance */
   index?: number;
   onDelete?: (id: string) => void;
+  /** anonymous share view: no auth-only actions, no dashboard links */
+  readOnly?: boolean;
 };
 
 export function SnippetCard({
@@ -48,6 +58,7 @@ export function SnippetCard({
   showAuthor = false,
   index = 0,
   onDelete,
+  readOnly = false,
 }: SnippetCardProps) {
   const router = useRouter();
   // local star state, seeded from the server and confirmed by the action
@@ -55,12 +66,16 @@ export function SnippetCard({
   const [starred, setStarred] = useState(snippet.starred);
   const [starCount, setStarCount] = useState(snippet.favorites);
   const [copied, setCopied] = useState(false);
+  // relative timestamps depend on Date.now() and the viewer's clock; render
+  // the deterministic date first, then switch after hydration
+  const mounted = useHydrated();
 
   const meta = LANGUAGE_META[snippet.language];
   const preview = snippet.code.split("\n").slice(0, MAX_PREVIEW_LINES);
   const truncated = snippet.code.split("\n").length > MAX_PREVIEW_LINES;
 
   const handleToggleFavorite = async () => {
+    if (readOnly) return;
     const previous = starred;
     setStarred(!previous);
     setStarCount((count) => (previous ? Math.max(0, count - 1) : count + 1));
@@ -78,8 +93,10 @@ export function SnippetCard({
     try {
       await navigator.clipboard.writeText(snippet.code);
       setCopied(true);
-      await incrementCopies(snippet.id);
+      // schedule the reset before the counter call: incrementing can fail
+      // (anonymous share view, rate limit) without leaving "Copied" stuck
       setTimeout(() => setCopied(false), 1600);
+      if (!readOnly) await incrementCopies(snippet.id);
     } catch {
       /* clipboard unavailable */
     }
@@ -93,16 +110,16 @@ export function SnippetCard({
     <motion.article
       variants={fadeUp}
       custom={index}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card/50 transition-colors hover:border-primary/30 hover:bg-card"
+      className="group relative flex flex-col overflow-hidden rounded-[22px] border border-line bg-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-30px_rgba(11,11,15,0.35)]"
     >
-      <div className="flex items-center gap-3 border-b border-border bg-muted/30 px-4 py-2.5">
+      <div className="flex items-center gap-3 border-b border-line bg-panel px-4 py-2.5">
         <span className={cn("size-2 shrink-0 rounded-full bg-current", meta.color)} />
-        <span className="font-mono text-xs text-muted-foreground">
+        <span className="font-rounded text-[12px] font-semibold text-soft">
           {snippet.language}
         </span>
         <span
           className={cn(
-            "ml-auto inline-flex items-center gap-1.5 font-mono text-[0.68rem]",
+            "ml-auto inline-flex items-center gap-1.5 font-rounded text-[0.7rem] font-semibold",
             snippet.visibility === "public"
               ? "text-syntax-function"
               : "text-muted-foreground",
@@ -119,39 +136,47 @@ export function SnippetCard({
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-start gap-3">
-          <Link
-            href={`/dashboard/snippets/${snippet.id}`}
-            className="min-w-0 flex-1"
-          >
-            <h3 className="truncate text-[0.98rem] font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
+          {readOnly ? (
+            <h3 className="min-w-0 flex-1 truncate text-[1rem] font-[650] tracking-[-0.02em] text-foreground">
               {snippet.title}
             </h3>
-          </Link>
-          <button
-            type="button"
-            onClick={handleToggleFavorite}
-            aria-label={starred ? "Remove from favorites" : "Add to favorites"}
-            aria-pressed={starred}
-            className={cn(
-              "inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 transition-colors",
-              starred
-                ? "text-syntax-number"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Star
-              className="size-4"
-              strokeWidth={1.75}
-              fill={starred ? "currentColor" : "none"}
-            />
-          </button>
+          ) : (
+            <Link
+              href={`/dashboard/snippets/${snippet.id}`}
+              className="min-w-0 flex-1"
+            >
+              <h3 className="truncate text-[1rem] font-[650] tracking-[-0.02em] text-foreground transition-colors group-hover:text-soft">
+                {snippet.title}
+              </h3>
+            </Link>
+          )}
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={handleToggleFavorite}
+              aria-label={starred ? "Remove from favorites" : "Add to favorites"}
+              aria-pressed={starred}
+              className={cn(
+                "inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 transition-colors",
+                starred
+                  ? "text-syntax-number"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Star
+                className="size-4"
+                strokeWidth={1.75}
+                fill={starred ? "currentColor" : "none"}
+              />
+            </button>
+          )}
         </div>
 
-        <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+        <p className="line-clamp-2 text-[14px] leading-relaxed text-soft">
           {snippet.description}
         </p>
 
-        <div className="relative overflow-hidden rounded-lg border border-border bg-background/60">
+        <div className="relative overflow-hidden rounded-xl bg-panel shadow-[inset_0_0_0_1px_rgba(11,11,15,0.05)]">
           <pre className="overflow-x-auto px-3.5 py-3 font-mono text-[0.72rem] leading-relaxed">
             <code>
               {preview.map((line, i) => (
@@ -168,7 +193,7 @@ export function SnippetCard({
           </pre>
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background/90 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-panel to-transparent"
           />
         </div>
 
@@ -180,10 +205,10 @@ export function SnippetCard({
           ))}
         </div>
 
-        <div className="mt-auto flex items-center gap-3 border-t border-border pt-3 font-mono text-[0.68rem] text-muted-foreground">
+        <div className="mt-auto flex items-center gap-3 border-t border-line pt-3 font-rounded text-[0.7rem] font-medium text-soft">
           {showAuthor && <span>by {snippet.authorName}</span>}
           <span className={showAuthor ? "ml-auto" : "mr-auto"}>
-            {relativeTime(snippet.updatedAt)}
+            {mounted ? relativeTime(snippet.updatedAt) : formatDate(snippet.updatedAt)}
           </span>
           <span className="inline-flex items-center gap-1">
             <Star className="size-3" fill="currentColor" strokeWidth={0} />
@@ -202,7 +227,9 @@ export function SnippetCard({
             )}
             {copied ? "Copied" : "Copy"}
           </button>
-          <ForkButton snippetId={snippet.id} authorId={snippet.authorId} label="Fork" />
+          {!readOnly && (
+            <ForkButton snippetId={snippet.id} authorId={snippet.authorId} label="Fork" />
+          )}
           {onDelete && (
             <button
               type="button"

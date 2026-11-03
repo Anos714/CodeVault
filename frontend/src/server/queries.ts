@@ -289,14 +289,18 @@ export async function listOwnSnippets(
   const { q = "", tag = "", visibility = "all", sort = "updated" } = filters;
   const limit = clampLimit(page.limit);
 
-  const conditions: (SQL | undefined)[] = [eq(snippets.authorId, userId)];
+  // Filters apply to both the page and the total. The cursor is paging state,
+  // not a filter, so it is added to `conditions` only after the count query.
+  const filterConditions: (SQL | undefined)[] = [
+    eq(snippets.authorId, userId),
+  ];
 
   if (visibility !== "all") {
-    conditions.push(eq(snippets.visibility, visibility));
+    filterConditions.push(eq(snippets.visibility, visibility));
   }
 
   if (tag) {
-    conditions.push(
+    filterConditions.push(
       inArray(
         snippets.id,
         db
@@ -327,11 +331,12 @@ export async function listOwnSnippets(
         ),
       );
     }
-    conditions.push(
+    filterConditions.push(
       tsq ? or(tsMatch(tsq), ...fallbacks) : or(...fallbacks),
     );
   }
 
+  const conditions = [...filterConditions];
   const cursor = decodeCursor(page.cursor);
   if (cursor) {
     conditions.push(afterCursor(vaultCursorColumn(sort), cursor));
@@ -347,7 +352,7 @@ export async function listOwnSnippets(
     db
       .select({ n: sql`count(*)`.mapWith(Number) })
       .from(snippets)
-      .where(eq(snippets.authorId, userId)),
+      .where(and(...filterConditions)),
   ]);
 
   // limit+1 probe: an extra row means another page exists
@@ -369,6 +374,19 @@ export async function listOwnSnippets(
     total: countRow?.n ?? 0,
     nextCursor,
   };
+}
+
+/** Lightweight id/title list for pickers (e.g. adding to a collection).
+ *  Not paginated on purpose: the picker must offer every snippet, and the
+ *  payload is only two short columns per row. */
+export async function listSnippetOptions(
+  userId: string,
+): Promise<Array<{ id: string; title: string }>> {
+  return db
+    .select({ id: snippets.id, title: snippets.title })
+    .from(snippets)
+    .where(eq(snippets.authorId, userId))
+    .orderBy(desc(snippets.updatedAt), snippets.id);
 }
 
 export async function getVaultStats(userId: string): Promise<{
@@ -714,17 +732,25 @@ async function collectionLinksFor(
   }));
 }
 
-/** Newest members first. Collections open only for the owner or through an
- *  unlisted link, which authorizes the full member list. */
+/** Newest members first. A collection can contain the owner's own snippets
+ *  (public or private) plus public snippets curated from other authors. A
+ *  foreign snippet that later turns private must disappear from the member
+ *  list — the collection link must never widen a snippet's visibility. */
 async function collectionMembers(
   collectionId: string,
+  ownerId: string,
   viewerId: string | null,
 ): Promise<HydratedSnippet[]> {
   const rows = await db
     .select({ snippet: snippets })
     .from(collectionSnippets)
     .innerJoin(snippets, eq(collectionSnippets.snippetId, snippets.id))
-    .where(eq(collectionSnippets.collectionId, collectionId))
+    .where(
+      and(
+        eq(collectionSnippets.collectionId, collectionId),
+        or(eq(snippets.visibility, "public"), eq(snippets.authorId, ownerId)),
+      ),
+    )
     .orderBy(desc(collectionSnippets.addedAt), snippets.id);
   return hydrate(
     rows.map((row) => row.snippet),
@@ -775,7 +801,7 @@ export async function getCollectionById(
       .where(eq(user.id, row.authorId))
       .limit(1)
       .then((rows) => rows[0]?.name ?? "unknown"),
-    collectionMembers(id, viewerId),
+    collectionMembers(id, row.authorId, viewerId),
     collectionLinksFor(id),
   ]);
 
@@ -820,7 +846,7 @@ export async function resolveCollectionToken(
       .where(eq(user.id, row.authorId))
       .limit(1)
       .then((rows) => rows[0]?.name ?? "unknown"),
-    collectionMembers(row.id, viewerId),
+    collectionMembers(row.id, row.authorId, viewerId),
   ]);
 
   return {

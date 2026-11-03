@@ -48,7 +48,7 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
           <span className="truncate font-mono text-[0.68rem] text-muted-foreground">
             {snippet.title}
           </span>
-          <EmbedCopyButton code={snippet.code} />
+          <EmbedCopyButton code={snippet.code} snippetId={snippet.id} />
         </header>
 
         <pre className="overflow-x-auto bg-background/40 px-3.5 py-3 font-mono text-[0.76rem] leading-relaxed">
@@ -73,6 +73,12 @@ export default async function EmbedPage({ params }: EmbedPageProps) {
   );
 }
 
-function EmbedCopyButton({ code }: { code: string }) {
-  return <CopyCodeButton code={code} />;
+function EmbedCopyButton({
+  code,
+  snippetId,
+}: {
+  code: string;
+  snippetId: string;
+}) {
+  return <CopyCodeButton code={code} snippetId={snippetId} />;
 }

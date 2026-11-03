@@ -4,8 +4,6 @@ import { LANGUAGE_META } from "@/lib/languages";
 import { getPublicSnippetById, resolveShareToken } from "@/server/queries";
 import { checkLimit, clientIp } from "@/server/ratelimit";
 
-export const runtime = "edge";
-
 /**
  * Social preview for a share link: title, language chip, and a peek at the
  * code, so a CodeVault URL pasted into Slack/Notion/X renders as a card
