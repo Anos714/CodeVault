@@ -1,85 +1,83 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 64 64"
+  viewBox="0 0 512 512"
   fill="none"
   role="img"
   aria-label="CodeVault logo"
 >
   <defs>
-    <linearGradient id="cv-bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0F151B" />
-      <stop offset="1" stop-color="#182230" />
+    <linearGradient id="cv-frame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f7f8fa" />
+      <stop offset="1" stop-color="#e2e5ea" />
     </linearGradient>
-    <linearGradient id="cv-accent" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0" stop-color="#2FBF9B" />
-      <stop offset="1" stop-color="#5BC0EB" />
+    <linearGradient id="cv-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17171d" />
+      <stop offset="1" stop-color="#08080b" />
     </linearGradient>
-    <radialGradient id="cv-glow" cx="0.5" cy="0.42" r="0.62">
-      <stop offset="0" stop-color="#2FBF9B" stop-opacity="0.30" />
-      <stop offset="1" stop-color="#2FBF9B" stop-opacity="0" />
+    <radialGradient id="cv-glow" cx="0.5" cy="0.36" r="0.62">
+      <stop offset="0" stop-color="#9eccff" stop-opacity="0.18" />
+      <stop offset="1" stop-color="#9eccff" stop-opacity="0" />
     </radialGradient>
   </defs>
 
-  <!-- tile -->
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#cv-bg)" />
-  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#cv-glow)" />
+  <!-- glass frame -->
+  <rect x="10" y="10" width="492" height="492" rx="122" fill="url(#cv-frame)" />
   <rect
-    x="2.75"
-    y="2.75"
-    width="58.5"
-    height="58.5"
-    rx="15.25"
-    stroke="url(#cv-accent)"
-    stroke-opacity="0.45"
-    stroke-width="1.5"
+    x="12"
+    y="12"
+    width="488"
+    height="488"
+    rx="120"
+    stroke="#ffffff"
+    stroke-opacity="0.9"
+    stroke-width="4"
   />
 
-  <!-- stacked code blocks (vault layers) -->
-  <g>
-    <!-- bottom layer -->
-    <rect
-      x="15"
-      y="29"
-      width="34"
-      height="20"
-      rx="5"
-      fill="#2FBF9B"
-      fill-opacity="0.10"
-      stroke="#2FBF9B"
-      stroke-opacity="0.22"
-      stroke-width="1.5"
-    />
-    <!-- middle layer -->
-    <rect
-      x="15"
-      y="23"
-      width="34"
-      height="20"
-      rx="5"
-      fill="#2FBF9B"
-      fill-opacity="0.16"
-      stroke="#2FBF9B"
-      stroke-opacity="0.32"
-      stroke-width="1.5"
-    />
-    <!-- top layer: the code window -->
-    <rect
-      x="15"
-      y="17"
-      width="34"
-      height="21"
-      rx="5"
-      fill="#0C1116"
-      stroke="url(#cv-accent)"
-      stroke-opacity="0.85"
-      stroke-width="1.6"
-    />
-    <!-- window dots -->
-    <circle cx="21.5" cy="23.5" r="1.9" fill="#E8B84B" />
-    <circle cx="28" cy="23.5" r="1.9" fill="#2FBF9B" />
-    <circle cx="34.5" cy="23.5" r="1.9" fill="#6E9BE8" />
-    <!-- code lines -->
-    <rect x="21" y="29" width="14" height="2.2" rx="1.1" fill="#6E9BE8" fill-opacity="0.85" />
-    <rect x="21" y="33.5" width="19" height="2.2" rx="1.1" fill="#8FA6BC" fill-opacity="0.7" />
-  </g>
+  <!-- ink tile -->
+  <rect x="46" y="46" width="420" height="420" rx="102" fill="url(#cv-tile)" />
+  <rect x="46" y="46" width="420" height="420" rx="102" fill="url(#cv-glow)" />
+  <rect
+    x="49"
+    y="49"
+    width="414"
+    height="414"
+    rx="99"
+    stroke="#ffffff"
+    stroke-opacity="0.1"
+    stroke-width="4"
+  />
+
+  <!-- code window -->
+  <rect
+    x="140"
+    y="166"
+    width="232"
+    height="180"
+    rx="48"
+    stroke="#ffffff"
+    stroke-opacity="0.92"
+    stroke-width="16"
+  />
+
+  <!-- code brackets -->
+  <path
+    d="M212 214 182 256l30 42"
+    stroke="#ffffff"
+    stroke-width="16"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M300 214 330 256l-30 42"
+    stroke="#ffffff"
+    stroke-width="16"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M276 206 236 306"
+    stroke="#9eccff"
+    stroke-width="16"
+    stroke-linecap="round"
+  />
 </svg>
