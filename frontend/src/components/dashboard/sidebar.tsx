@@ -67,12 +67,12 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
                 className={cn(
                   "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors outline-none",
                   "focus-visible:ring-2 focus-visible:ring-ring/70",
-                  // icon-only needs a square hit area and a tighter radius —
-                  // the wide 16px pill reads as a blob when it shrinks to 40px
-                  collapsed && "mx-auto size-10 justify-center rounded-md px-0",
+                  // icon-only wants a square hit area and a tighter radius;
+                  // gap-0 stops the row gap pushing the icon off-centre
+                  collapsed && "mx-auto size-9 justify-center gap-0 rounded-[10px] px-0",
                   active
                     ? collapsed
-                      ? "bg-foreground/8 text-foreground"
+                      ? "bg-foreground/8 text-foreground shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_6%,transparent)]"
                       : "bg-foreground text-background shadow-sm"
                     : "text-soft hover:bg-panel hover:text-foreground",
                 )}
@@ -91,9 +91,8 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
                 <span
                   className={cn(
                     "truncate transition-opacity",
-                    collapsed
-                      ? "pointer-events-none w-0 opacity-0"
-                      : "opacity-100",
+                    // out of the flex flow, but still the link's accessible name
+                    collapsed ? "sr-only" : "opacity-100",
                   )}
                 >
                   {label}
