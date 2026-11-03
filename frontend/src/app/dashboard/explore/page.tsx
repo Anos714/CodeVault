@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { ExploreView } from "@/app/dashboard/explore/explore-view";
 import { auth } from "@/server/auth";
 import { exploreSnippets } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Explore public snippets",
+};
 
 type ExplorePageProps = {
   searchParams: Promise<{ q?: string; starred?: string }>;

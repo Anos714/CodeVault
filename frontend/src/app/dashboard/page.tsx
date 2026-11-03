@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { OverviewView } from "@/app/dashboard/overview-view";
 import { auth } from "@/server/auth";
 import { getRecentSnippets, getVaultStats } from "@/server/queries";
 import type { HydratedSnippet } from "@/lib/snippet-types";
+
+export const metadata: Metadata = {
+  title: "Vault overview",
+};
 
 /**
  * Server component: stats and recent snippets come from the DAL, the layout

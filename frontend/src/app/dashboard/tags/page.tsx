@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { TagsView } from "@/app/dashboard/tags/tags-view";
 import { auth } from "@/server/auth";
 import { getLanguageCounts, getTagCounts } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Tags",
+};
 
 /** Server component: tag cloud and language grid come straight from the DAL. */
 export default async function TagsPage() {

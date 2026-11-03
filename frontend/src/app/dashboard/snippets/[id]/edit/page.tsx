@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -5,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { EditForm } from "@/app/dashboard/snippets/[id]/edit/edit-form";
 import { auth } from "@/server/auth";
 import { getSnippetById } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Edit snippet",
+};
 
 /**
  * Server component: the draft comes from the DAL and only the owner gets

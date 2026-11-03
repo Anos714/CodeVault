@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { CollectionsView } from "@/app/dashboard/collections/collections-view";
 import { auth } from "@/server/auth";
 import { listCollections } from "@/server/queries";
 import type { Collection } from "@/lib/snippet-types";
+
+export const metadata: Metadata = {
+  title: "Collections",
+};
 
 /** Server component: the owner's folders with member counts. */
 export default async function CollectionsPage() {
