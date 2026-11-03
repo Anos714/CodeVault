@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -27,6 +27,7 @@ import {
 } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { easeOutExpo } from "@/lib/motion";
+import { useBrowserOrigin } from "@/lib/client-hooks";
 import type { Snippet } from "@/lib/snippet-types";
 
 type ShareDialogProps = {
@@ -44,6 +45,46 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
   const [expiry, setExpiry] = useState<ShareExpiryDays>(null);
   const [justMinted, setJustMinted] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const origin = useBrowserOrigin();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Escape closes; focus moves into the dialog and returns to the trigger.
+  // Tab is trapped so keyboard users cannot wander behind the modal.
+  useEffect(() => {
+    if (!open) return;
+
+    const previous = document.activeElement as HTMLElement | null;
+    dialogRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onOpenChange(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const nodes = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!nodes || nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      previous?.focus?.();
+    };
+  }, [open, onOpenChange]);
 
   const handleMint = async () => {
     try {
@@ -88,6 +129,8 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
           onClick={() => onOpenChange(false)}
         >
           <motion.div
+            ref={dialogRef}
+            tabIndex={-1}
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.97 }}
@@ -96,7 +139,7 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
             aria-modal="true"
             aria-labelledby="share-dialog-title"
             onClick={(event) => event.stopPropagation()}
-            className="flex w-full max-w-lg flex-col gap-5 rounded-2xl border border-border bg-card p-6 shadow-2xl shadow-black/30"
+            className="flex w-full max-w-lg flex-col gap-5 rounded-[24px] border border-line bg-card p-6 shadow-[0_30px_70px_-30px_rgba(11,11,15,0.45)]"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col gap-1.5">
@@ -185,7 +228,7 @@ export function ShareDialog({ snippet, open, onOpenChange }: ShareDialogProps) {
                     .slice()
                     .reverse()
                     .map((link) => {
-                      const url = shareUrl(link.token);
+                      const url = shareUrl(link.token, origin);
                       const isNew = link.token === justMinted;
                       return (
                         <li
