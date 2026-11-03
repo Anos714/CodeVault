@@ -274,7 +274,9 @@ export function HowItWorks() {
                       chapterRefs.current[index] = node;
                     }}
                     className={cn(
-                      "relative flex min-h-[42vh] flex-col justify-center py-8 transition-opacity duration-500 lg:min-h-[56vh]",
+                      // the tall chapters only exist to give the pinned visual
+                      // room to scroll past; stacked they would be dead space
+                      "relative flex flex-col justify-center py-8 transition-opacity duration-500 lg:min-h-[56vh]",
                       active === index ? "opacity-100" : "lg:opacity-45",
                     )}
                   >
