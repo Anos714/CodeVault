@@ -140,15 +140,15 @@ export function OverviewView({
 
 function EmptyVault() {
   return (
-    <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-card/30 px-6 py-16 text-center">
-      <div className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted/40">
+    <div className="flex flex-col items-center gap-4 rounded-[28px] border border-dashed border-line bg-panel px-6 py-16 text-center">
+      <div className="flex size-12 items-center justify-center rounded-2xl bg-white shadow-[inset_0_0_0_1px_rgba(11,11,15,0.06)]">
         <FileCode2 className="size-6 text-muted-foreground" strokeWidth={1.5} />
       </div>
       <div className="flex flex-col gap-2">
-        <h3 className="text-base font-semibold text-foreground">
+        <h3 className="text-[18px] font-[650] tracking-[-0.02em] text-foreground">
           Your vault is empty
         </h3>
-        <p className="max-w-sm text-pretty text-sm leading-relaxed text-muted-foreground">
+        <p className="max-w-sm text-pretty text-sm leading-relaxed text-soft">
           Save your first snippet and stop rewriting the same utility. Tag it,
           set it public or private, and find it in seconds.
         </p>

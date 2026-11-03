@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, X, LogOut, ExternalLink } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { dashboardNav } from "@/lib/dashboard-nav";
 import { signOut } from "@/lib/auth-client";
@@ -45,7 +46,7 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
     <nav className="flex flex-1 flex-col gap-1 px-3" aria-label="Dashboard">
       <span
         className={cn(
-          "px-3 pb-2 pt-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground/60",
+          "px-3 pb-2 pt-1 font-rounded text-[0.66rem] font-bold uppercase tracking-[0.14em] text-soft/70",
           collapsed && "sr-only",
         )}
       >
@@ -67,15 +68,15 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
                   "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors outline-none",
                   "focus-visible:ring-2 focus-visible:ring-ring/50",
                   active
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  collapsed && "justify-center px-0",
+                    ? "bg-foreground text-background shadow-sm"
+                    : "text-soft hover:bg-panel hover:text-foreground",
+                  collapsed && "mx-auto w-10 justify-center px-0",
                 )}
               >
-                {active && (
+                {active && !collapsed && (
                   <motion.span
                     layoutId="sidebar-active"
-                    className="absolute left-0 top-1/2 h-5 w-[2.5px] -translate-y-1/2 rounded-full bg-primary"
+                    className="absolute left-1.5 top-1/2 h-4 w-[2.5px] -translate-y-1/2 rounded-full bg-background/80"
                     transition={{ duration: 0.3, ease: easeOutExpo }}
                   />
                 )}
@@ -121,7 +122,7 @@ function SidebarFooter({ user, collapsed }: SidebarFooterProps) {
             className="size-8 shrink-0 rounded-full object-cover"
           />
         ) : (
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/15 font-mono text-xs font-semibold text-primary">
+          <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-butter font-rounded text-xs font-bold text-ink">
             {initials(user.name ?? "developer")}
           </span>
         )}
@@ -129,7 +130,7 @@ function SidebarFooter({ user, collapsed }: SidebarFooterProps) {
           <span className="truncate text-sm font-medium text-foreground">
             {user.name}
           </span>
-          <span className="truncate font-mono text-[0.68rem] text-muted-foreground">
+          <span className="truncate font-rounded text-[0.68rem] font-medium text-soft">
             {user.email}
           </span>
         </div>
@@ -158,6 +159,31 @@ function SidebarFooter({ user, collapsed }: SidebarFooterProps) {
   );
 }
 
+function SidebarBottom({ collapsed }: { collapsed: boolean }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 border-t border-border p-3",
+        collapsed ? "flex-col-reverse justify-center" : "justify-between",
+      )}
+    >
+      <Link
+        href="/"
+        target="_blank"
+        className={cn(
+          "inline-flex items-center gap-2 rounded-lg px-2 py-1.5 font-rounded text-[0.68rem] font-medium text-soft transition-colors hover:text-foreground",
+          collapsed && "px-0",
+        )}
+        title={collapsed ? "View the landing page" : undefined}
+      >
+        <ExternalLink className="size-3.5" />
+        <span className={cn(collapsed && "sr-only")}>codevault.dev</span>
+      </Link>
+      <ThemeToggle className="shrink-0" />
+    </div>
+  );
+}
+
 export function Sidebar({ variant = "rail", user }: SidebarProps) {
   const collapsed = useUIStore((state) => state.isSidebarCollapsed);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
@@ -182,7 +208,7 @@ export function Sidebar({ variant = "rail", user }: SidebarProps) {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ duration: 0.3, ease: easeOutExpo }}
-              className="fixed inset-y-0 left-0 z-70 flex w-72 flex-col border-r border-border bg-card"
+              className="fixed inset-y-0 left-0 z-70 flex w-72 flex-col border-r border-line bg-background"
             >
               <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
                 <Link href="/dashboard" onClick={() => setSidebarOpen(false)}>
@@ -199,6 +225,7 @@ export function Sidebar({ variant = "rail", user }: SidebarProps) {
               </div>
               <SidebarNav collapsed={false} />
               <SidebarFooter user={user} collapsed={false} />
+              <SidebarBottom collapsed={false} />
             </motion.aside>
           </>
         )}
@@ -210,7 +237,7 @@ export function Sidebar({ variant = "rail", user }: SidebarProps) {
     <motion.aside
       animate={{ width: collapsed ? "4.5rem" : "16rem" }}
       transition={{ duration: 0.3, ease: easeOutExpo }}
-      className="sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-border bg-card/50 md:flex"
+      className="sticky top-0 hidden h-dvh shrink-0 flex-col border-r border-line bg-background md:flex"
     >
       <div
         className={cn(
@@ -228,13 +255,14 @@ export function Sidebar({ variant = "rail", user }: SidebarProps) {
           aria-expanded={!collapsed}
           className={cn(
             "inline-flex size-8 items-center justify-center rounded-lg border border-border bg-background/60 text-muted-foreground transition-colors hover:text-foreground",
-            collapsed && "absolute right-2 top-4 z-10",
+            collapsed &&
+              "absolute -right-3 top-5 z-30 size-6 rounded-full bg-background shadow-[0_2px_10px_rgba(11,11,15,0.14)] hover:bg-panel",
           )}
         >
           <ChevronLeft
             className={cn(
               "size-4 transition-transform",
-              collapsed && "rotate-180",
+              collapsed && "size-3.5 rotate-180",
             )}
           />
         </button>
@@ -242,26 +270,7 @@ export function Sidebar({ variant = "rail", user }: SidebarProps) {
 
       <SidebarNav collapsed={collapsed} />
       <SidebarFooter user={user} collapsed={collapsed} />
-
-      <div
-        className={cn(
-          "border-t border-border p-3",
-          collapsed && "flex justify-center",
-        )}
-      >
-        <Link
-          href="/"
-          target="_blank"
-          className={cn(
-            "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-[0.68rem] text-muted-foreground transition-colors hover:text-foreground",
-            collapsed && "px-0",
-          )}
-          title={collapsed ? "View the landing page" : undefined}
-        >
-          <ExternalLink className="size-3.5" />
-          <span className={cn(collapsed && "sr-only")}>codevault.dev</span>
-        </Link>
-      </div>
+      <SidebarBottom collapsed={collapsed} />
     </motion.aside>
   );
 }
