@@ -145,6 +145,9 @@ export function DetailView({ snippet, isOwner }: DetailViewProps) {
                 </Badge>
               </Link>
             ))}
+            <span className="ml-auto font-mono text-xs text-muted-foreground">
+              updated {relativeTime(snippet.updatedAt)}
+            </span>
           </div>
 
           <h1 className="text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -183,6 +186,7 @@ export function DetailView({ snippet, isOwner }: DetailViewProps) {
             className="h-9 gap-2 rounded-xl px-4"
             onClick={handleToggleFavorite}
             aria-pressed={starred}
+            aria-label={starred ? "Remove from favorites" : "Add to favorites"}
           >
             <Star
               className="size-4"
@@ -217,9 +221,26 @@ export function DetailView({ snippet, isOwner }: DetailViewProps) {
             </Link>
           )}
 
-          <span className="ml-auto font-mono text-xs text-muted-foreground">
-            updated {relativeTime(snippet.updatedAt)}
-          </span>
+          {isOwner && (
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                className="h-9 gap-2 rounded-xl px-4"
+                render={<Link href={`/dashboard/snippets/${snippet.id}/edit`} />}
+              >
+                <Pencil className="size-4" />
+                Edit
+              </Button>
+              <Button
+                variant="destructive"
+                className="h-9 gap-2 rounded-xl px-4"
+                onClick={handleDelete}
+              >
+                <Trash2 className="size-4" />
+                {confirmDelete ? "Confirm delete" : "Delete"}
+              </Button>
+            </div>
+          )}
         </motion.div>
 
         <motion.div
@@ -248,35 +269,6 @@ export function DetailView({ snippet, isOwner }: DetailViewProps) {
             className="rounded-none border-0"
           />
         </motion.div>
-
-        {isOwner && (
-          <motion.div
-            variants={fadeUp}
-            className="flex flex-wrap items-center gap-2"
-          >
-            <Button
-              variant="outline"
-              className="h-9 gap-2 rounded-xl px-4"
-              render={<Link href={`/dashboard/snippets/${snippet.id}/edit`} />}
-            >
-              <Pencil className="size-4" />
-              Edit snippet
-            </Button>
-            <Button
-              variant="destructive"
-              className="h-9 gap-2 rounded-xl px-4"
-              onClick={handleDelete}
-            >
-              <Trash2 className="size-4" />
-              {confirmDelete ? "Click again to confirm" : "Delete"}
-            </Button>
-            {confirmDelete && (
-              <span className="font-mono text-xs text-destructive">
-                this can&apos;t be undone
-              </span>
-            )}
-          </motion.div>
-        )}
       </motion.div>
 
       {isOwner && (
