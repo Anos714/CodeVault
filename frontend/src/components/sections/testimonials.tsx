@@ -89,7 +89,7 @@ function Card({ quote, name, role, initials, accent, tint }: Testimonial) {
   return (
     <figure
       className={cn(
-        "group relative mb-4 break-inside-avoid overflow-hidden rounded-[26px] bg-gradient-to-br via-panel to-panel p-6 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_5%,transparent)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_50px_-36px_color-mix(in_srgb,var(--foreground)_40%,transparent)]",
+        "group relative flex h-full flex-col overflow-hidden rounded-[26px] bg-gradient-to-br via-panel to-panel p-6 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--foreground)_5%,transparent)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_50px_-36px_color-mix(in_srgb,var(--foreground)_40%,transparent)]",
         tint,
       )}
     >
@@ -127,11 +127,13 @@ function Card({ quote, name, role, initials, accent, tint }: Testimonial) {
         </span>
       </div>
 
-      <blockquote className="relative mt-4 text-pretty text-[16px] leading-[1.5] text-foreground">
+      <blockquote className="relative mt-4 mb-6 text-pretty text-[16px] leading-[1.5] text-foreground">
         {quote}
       </blockquote>
 
-      <div className="relative mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
+      {/* the row stretches to the tallest card, so the footer stays pinned
+          to the bottom edge instead of floating at a ragged height */}
+      <div className="relative mt-auto flex items-center justify-between gap-3 border-t border-line pt-3">
         <span className="inline-flex items-center gap-1.5 font-rounded text-[11.5px] font-semibold text-soft">
           <BadgeCheck className="size-3.5 text-success" />
           Early CodeVault user
@@ -164,10 +166,10 @@ export function Testimonials() {
         <motion.div
           variants={staggerContainer(0.07)}
           {...inViewProps}
-          className="mt-12 columns-1 gap-4 md:columns-2 lg:columns-3"
+          className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
         >
           {testimonials.map((t) => (
-            <motion.div key={t.name} variants={fadeUp}>
+            <motion.div key={t.name} variants={fadeUp} className="h-full">
               <Card {...t} />
             </motion.div>
           ))}
