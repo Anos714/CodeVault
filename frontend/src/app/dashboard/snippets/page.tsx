@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { SnippetsView, type SnippetFilters } from "@/app/dashboard/snippets/snippets-view";
@@ -5,6 +6,10 @@ import { auth } from "@/server/auth";
 import { getTagCounts, listOwnSnippets } from "@/server/queries";
 import type { VaultFilters } from "@/server/queries";
 import type { HydratedSnippet } from "@/lib/snippet-types";
+
+export const metadata: Metadata = {
+  title: "My snippets",
+};
 
 type SnippetsPageProps = {
   searchParams: Promise<{

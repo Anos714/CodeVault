@@ -1,9 +1,14 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { SettingsView } from "@/app/dashboard/settings/settings-view";
 import { auth } from "@/server/auth";
 import { listTokensForUser } from "@/server/api/tokens";
 import { getVaultStats } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Settings",
+};
 
 /**
  * Server component: identity comes from the session, the snippet count and

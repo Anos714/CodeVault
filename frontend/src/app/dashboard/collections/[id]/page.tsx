@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -5,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { CollectionDetailView } from "@/app/dashboard/collections/[id]/collection-detail-view";
 import { auth } from "@/server/auth";
 import { getCollectionById, listSnippetOptions } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Collection",
+};
 
 /**
  * Server component: the folder (members + links) plus add-candidates, owner

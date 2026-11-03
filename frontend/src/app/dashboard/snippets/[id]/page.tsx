@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -5,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { DetailView } from "@/app/dashboard/snippets/[id]/detail-view";
 import { auth } from "@/server/auth";
 import { getSnippetById } from "@/server/queries";
+
+export const metadata: Metadata = {
+  title: "Snippet",
+};
 
 /**
  * Server component: the snippet (plus the viewer's star and, for the owner,
