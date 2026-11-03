@@ -11,6 +11,7 @@
  */
 
 import { hashPassword } from "better-auth/crypto";
+import { eq } from "drizzle-orm";
 
 import { db } from "../src/server/db";
 import {
@@ -43,6 +44,21 @@ const DEMO_FAVORITES = ["snip_lru", "snip_go_graceful"];
 
 async function seed() {
   console.log("→ seeding CodeVault database…\n");
+
+  // DEMO_EMAIL can be overridden. If it already belongs to a different
+  // account, ON CONFLICT (id) would still trip the email unique constraint —
+  // fail with a clear message instead of a raw Postgres error.
+  const [emailOwner] = await db
+    .select({ id: user.id })
+    .from(user)
+    .where(eq(user.email, DEMO_USER.email))
+    .limit(1);
+  if (emailOwner && emailOwner.id !== DEMO_USER.id) {
+    throw new Error(
+      `DEMO_EMAIL (${DEMO_USER.email}) already belongs to user ${emailOwner.id}. ` +
+        "Unset DEMO_EMAIL or choose another address before seeding.",
+    );
+  }
 
   await db.insert(user).values(DEMO_USER).onConflictDoNothing({
     target: user.id,
