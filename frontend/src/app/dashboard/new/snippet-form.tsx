@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
 import { Check, Globe, Lock, Sparkles } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { CodeEditor } from "@/components/dashboard/code-editor";
@@ -14,9 +13,10 @@ import { LANGUAGES, LANGUAGE_META, isLanguage } from "@/lib/languages";
 import type { Visibility } from "@/lib/snippet-types";
 import type { SnippetTemplate } from "@/lib/templates";
 import { cn } from "@/lib/utils";
-import { easeOutExpo } from "@/lib/motion";
 
 const MAX_TAGS = 5;
+/** matches the editor's `lineHeight` option so the box can grow with the code */
+const LINE_HEIGHT = 20;
 
 type SnippetFormProps = {
   /** the user's "new snippets default to private" preference */
@@ -93,19 +93,21 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
     }
   };
 
+  // the editor grows with the snippet instead of hiding the tail behind a scroll
+  const editorHeight = Math.min(
+    560,
+    Math.max(320, code.split("\n").length * LINE_HEIGHT + 64),
+  );
+
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
       <DashboardHeader
         eyebrow="New snippet"
         title="Vault a snippet"
         description="Write or paste the code, tag it, and choose who can see it. Everything saves to your vault."
       />
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_minmax(0,1fr)]"
-      >
-        {/* ---------- form ---------- */}
+      <form onSubmit={handleSubmit} className="flex flex-col">
         <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card/40 p-5">
           <TemplatePicker language={language} onPick={applyTemplate} />
 
@@ -121,19 +123,14 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
             />
           </Field>
 
-          <Field
-            label="Description"
-            htmlFor="snippet-description"
-            optional
-          >
-            <textarea
-              id="snippet-description"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              placeholder="What does it do, and when do you reach for it?"
-              rows={2}
-              maxLength={220}
-              className={cn(inputClass(false), "resize-none")}
+          <Field label="Code" error={errors.code} htmlFor="snippet-code">
+            <CodeEditor
+              value={code}
+              language={language}
+              onChange={setCode}
+              autoFocus
+              height={editorHeight}
+              aria-label="Snippet code"
             />
           </Field>
 
@@ -221,18 +218,20 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
             </div>
           </Field>
 
-          <Field label="Code" error={errors.code} htmlFor="snippet-code">
-            <CodeEditor
-              value={code}
-              language={language}
-              onChange={setCode}
-              autoFocus
-              height={340}
-              aria-label="Snippet code"
+          <Field label="Description" htmlFor="snippet-description" optional>
+            <textarea
+              id="snippet-description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              placeholder="What does it do, and when do you reach for it?"
+              rows={2}
+              maxLength={220}
+              className={cn(inputClass(false), "resize-none")}
             />
           </Field>
 
-          <div className="flex items-center gap-3 border-t border-border pt-4">
+          {/* the save stays reachable while the fields below the editor scroll */}
+          <div className="sticky bottom-0 -mx-5 -mb-5 flex items-center gap-3 rounded-b-2xl border-t border-border bg-card/95 px-5 py-4 backdrop-blur-sm">
             <Button
               type="submit"
               size="lg"
@@ -257,80 +256,6 @@ export function SnippetForm({ defaultVisibility }: SnippetFormProps) {
                 : "Only you can see it"}
             </span>
           </div>
-        </div>
-
-        {/* ---------- live preview ---------- */}
-        <div className="flex flex-col gap-4 lg:sticky lg:top-8 lg:self-start">
-          <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground/70">
-            Live preview
-          </span>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: easeOutExpo }}
-            className="overflow-hidden rounded-2xl border border-border bg-card/50"
-          >
-            <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2.5">
-              <span className="flex gap-1.5">
-                <span className="size-2.5 rounded-full bg-syntax-number/70" />
-                <span className="size-2.5 rounded-full bg-primary/70" />
-                <span className="size-2.5 rounded-full bg-syntax-function/70" />
-              </span>
-              <span className="ml-2 font-mono text-xs text-muted-foreground">
-                {title.trim()
-                  ? title.trim().toLowerCase().replace(/\s+/g, "-")
-                  : "untitled"}
-                .{language === "typescript" ? "ts" : language === "javascript" ? "js" : language}
-              </span>
-              <span
-                className={cn(
-                  "ml-auto inline-flex items-center gap-1 font-mono text-[0.68rem]",
-                  visibility === "public"
-                    ? "text-syntax-function"
-                    : "text-muted-foreground",
-                )}
-              >
-                {visibility === "public" ? (
-                  <Globe className="size-3.5" />
-                ) : (
-                  <Lock className="size-3.5" />
-                )}
-                {visibility}
-              </span>
-            </div>
-            <pre className="overflow-x-auto px-4 py-4 font-mono text-[0.8rem] leading-relaxed">
-              <code>
-                {code ? (
-                  code.split("\n").map((line, i) => (
-                    <div key={i} className="flex gap-4">
-                      <span className="w-5 shrink-0 select-none text-right text-muted-foreground/40 tabular-nums">
-                        {i + 1}
-                      </span>
-                      <span className="whitespace-pre text-foreground/90">
-                        {line || " "}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <span className="select-none text-muted-foreground/50">
-                    {"// your code appears here as you type"}
-                  </span>
-                )}
-              </code>
-            </pre>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 border-t border-border px-4 py-3">
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-border bg-muted/50 px-2 py-0.5 font-mono text-xs text-muted-foreground"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </motion.div>
         </div>
       </form>
     </div>
