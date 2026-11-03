@@ -1,0 +1,110 @@
+{
+  "name": "codevault-vscode",
+  "displayName": "CodeVault",
+  "description": "Save, search, and insert CodeVault snippets without leaving the editor.",
+  "version": "0.1.0",
+  "publisher": "codevault",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": ["Other"],
+  "keywords": ["snippets", "codevault", "code", "search"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codevault.connect",
+        "title": "CodeVault: Connect Account"
+      },
+      {
+        "command": "codevault.disconnect",
+        "title": "CodeVault: Disconnect"
+      },
+      {
+        "command": "codevault.saveSelection",
+        "title": "CodeVault: Save Selection"
+      },
+      {
+        "command": "codevault.saveFile",
+        "title": "CodeVault: Save File"
+      },
+      {
+        "command": "codevault.search",
+        "title": "CodeVault: Search Snippets"
+      },
+      {
+        "command": "codevault.insert",
+        "title": "CodeVault: Insert Snippet"
+      },
+      {
+        "command": "codevault.openInWeb",
+        "title": "CodeVault: Open Snippet in Web App"
+      },
+      {
+        "command": "codevault.openSettings",
+        "title": "CodeVault: Open Web Settings"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codevault.saveSelection",
+          "when": "editorHasSelection",
+          "group": "navigation@90"
+        },
+        {
+          "command": "codevault.insert",
+          "group": "navigation@91"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "codevault.saveSelection",
+        "key": "ctrl+alt+s",
+        "mac": "cmd+alt+s",
+        "when": "editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "CodeVault",
+      "properties": {
+        "codevault.baseUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "Base URL of your CodeVault instance."
+        },
+        "codevault.defaultVisibility": {
+          "type": "string",
+          "enum": ["private", "public"],
+          "default": "private",
+          "description": "Visibility selected by default when saving a snippet."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "package": "bun run build && vsce package --no-dependencies",
+    "check": "bun run typecheck && bun run lint && bun run test && bun run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^20.19.25",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.2",
+    "esbuild": "^0.25.12",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vitest": "^5.1.0"
+  }
+}

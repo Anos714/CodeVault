@@ -1,0 +1,13 @@
+src/**
+tests/**
+scripts/**
+node_modules/**
+tsconfig.json
+eslint.config.mjs
+vitest.config.ts
+.vscode/**
+.gitignore
+**/*.map
+bun.lock
+bun.lockb
+vitest.config.mts
