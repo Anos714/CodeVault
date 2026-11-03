@@ -23,6 +23,7 @@ export function CollectionsView({ collections }: CollectionsViewProps) {
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -41,6 +42,7 @@ export function CollectionsView({ collections }: CollectionsViewProps) {
   };
 
   const handleDelete = async (id: string) => {
+    setConfirmingId(null);
     try {
       await deleteCollection(id);
     } catch {
@@ -121,14 +123,33 @@ export function CollectionsView({ collections }: CollectionsViewProps) {
                     {collection.snippetCount === 1 ? "" : "s"}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(collection.id)}
-                  aria-label={`Delete ${collection.name}`}
-                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 text-muted-foreground transition-colors hover:text-destructive"
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
+                {confirmingId === collection.id ? (
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(collection.id)}
+                      className="rounded-md border border-destructive/40 bg-destructive/10 px-2 py-1 font-mono text-[0.68rem] text-destructive transition-colors hover:bg-destructive/20"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingId(null)}
+                      className="rounded-md border border-border bg-background/60 px-2 py-1 font-mono text-[0.68rem] text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingId(collection.id)}
+                    aria-label={`Delete ${collection.name}`}
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-border bg-background/60 text-muted-foreground transition-colors hover:text-destructive"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                )}
               </div>
               {collection.description && (
                 <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">

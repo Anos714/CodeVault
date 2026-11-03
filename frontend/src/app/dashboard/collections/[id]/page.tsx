@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CollectionDetailView } from "@/app/dashboard/collections/[id]/collection-detail-view";
 import { auth } from "@/server/auth";
-import { getCollectionById, listOwnSnippets } from "@/server/queries";
+import { getCollectionById, listSnippetOptions } from "@/server/queries";
 
 /**
  * Server component: the folder (members + links) plus add-candidates, owner
@@ -50,16 +50,12 @@ export default async function CollectionDetailPage({
   }
 
   const memberIds = new Set((collection.snippets ?? []).map((s) => s.id));
-  const { snippets } = userId
-    ? await listOwnSnippets(userId, {}, { limit: 50 })
-    : { snippets: [] };
+  const options = userId ? await listSnippetOptions(userId) : [];
 
   return (
     <CollectionDetailView
       collection={collection}
-      candidates={snippets
-        .filter((s) => !memberIds.has(s.id))
-        .map((s) => ({ id: s.id, title: s.title }))}
+      candidates={options.filter((s) => !memberIds.has(s.id))}
     />
   );
 }
