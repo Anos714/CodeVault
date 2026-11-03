@@ -67,10 +67,14 @@ function SidebarNav({ collapsed }: { collapsed: boolean }) {
                 className={cn(
                   "group relative flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors outline-none",
                   "focus-visible:ring-2 focus-visible:ring-ring/70",
+                  // icon-only needs a square hit area and a tighter radius —
+                  // the wide 16px pill reads as a blob when it shrinks to 40px
+                  collapsed && "mx-auto size-10 justify-center rounded-md px-0",
                   active
-                    ? "bg-foreground text-background shadow-sm"
+                    ? collapsed
+                      ? "bg-foreground/8 text-foreground"
+                      : "bg-foreground text-background shadow-sm"
                     : "text-soft hover:bg-panel hover:text-foreground",
-                  collapsed && "mx-auto w-10 justify-center px-0",
                 )}
               >
                 {active && !collapsed && (
