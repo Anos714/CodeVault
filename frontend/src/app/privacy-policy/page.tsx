@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How CodeVault handles your snippets, account information, and cookies — explained in plain language.",
+  alternates: { canonical: "/privacy-policy" },
 };
 
 const sections = [

@@ -6,6 +6,7 @@ import { SignInOptions } from "@/components/site/sign-in-options";
 export const metadata: Metadata = {
   title: "Sign in",
   description: "Sign in to CodeVault with Google or GitHub to access your code snippets.",
+  alternates: { canonical: "/auth" },
 };
 
 export default function AuthPage() {

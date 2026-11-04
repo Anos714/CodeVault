@@ -1,10 +1,16 @@
 import { headers } from "next/headers";
+import type { Metadata } from "next";
 
 import { CommandPalette } from "@/components/dashboard/command-palette";
 import { Topbar } from "@/components/dashboard/topbar";
 import { SignInGate } from "@/components/dashboard/sign-in-gate";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { auth } from "@/server/auth";
+
+/** The dashboard is an app surface, not content — never send it to crawlers. */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Server-side gate: no session, no shell. The Proxy redirects most
