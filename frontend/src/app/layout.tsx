@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { SiteJsonLd } from "@/components/site/structured-data";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col bg-background font-sans">
+        <SiteJsonLd />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

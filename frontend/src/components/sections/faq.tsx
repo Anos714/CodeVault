@@ -9,35 +9,8 @@ import {
   staggerContainer,
   inViewProps,
 } from "@/lib/motion";
+import { faqs } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
-
-const faqs = [
-  {
-    question: "Is CodeVault free?",
-    answer:
-      "Yes. CodeVault is open source under the MIT license — you can self-host it or use the hosted version at no cost.",
-  },
-  {
-    question: "Do I need an account to browse public snippets?",
-    answer:
-      "Anyone can browse and view public snippets. An account is only required to create, edit, and manage your own private snippets.",
-  },
-  {
-    question: "Which languages are supported?",
-    answer:
-      "Anything you can type. Syntax highlighting covers the popular languages out of the box, and the Monaco editor handles dozens more.",
-  },
-  {
-    question: "Can I keep snippets private?",
-    answer:
-      "Every snippet defaults to private. Flip a single switch to make it public and shareable whenever you want.",
-  },
-  {
-    question: "Is my data portable?",
-    answer:
-      "It is your code. You can copy any snippet to your clipboard in one click, and the source is fully open if you'd rather self-host.",
-  },
-];
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);

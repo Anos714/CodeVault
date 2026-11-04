@@ -13,76 +13,42 @@ import {
   ThemeVisual,
 } from "@/components/site/feature-visuals";
 import { fadeUp, staggerContainer, inViewProps } from "@/lib/motion";
+import { features as featureContent, type FeatureId } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
-type Feature = {
-  title: string;
-  description: string;
+type Feature = (typeof featureContent)[number] & {
   visual: ComponentType;
   icon: ComponentType<{ className?: string; strokeWidth?: number }>;
-  iconLabel: string;
-  chip: string;
-  span: string;
 };
 
-const features: Feature[] = [
-  {
-    title: "A real editor, in your browser",
-    description:
-      "The same engine that powers VS Code — real syntax highlighting, indentation, and instant language switching.",
-    visual: EditorVisual,
-    icon: Code2,
-    iconLabel: "Editor",
-    chip: "bg-sky/70 text-ink",
-    span: "sm:col-span-2 lg:col-span-4",
-  },
-  {
-    title: "Search that actually finds it",
-    description: "Match on title, language, description, or tags.",
-    visual: SearchVisual,
-    icon: Search,
-    iconLabel: "Search",
-    chip: "bg-butter/80 text-ink",
-    span: "sm:col-span-2 lg:col-span-2",
-  },
-  {
-    title: "Tags, not folders",
-    description: "Organize flat and fast with #tags that travel with your code.",
-    visual: TagsVisual,
-    icon: Tag,
-    iconLabel: "Tags",
-    chip: "bg-blush/60 text-ink",
-    span: "lg:col-span-2",
-  },
-  {
-    title: "Private by default",
-    description: "Keep snippets to yourself, or flip one switch to share.",
-    visual: PrivacyVisual,
-    icon: Lock,
-    iconLabel: "Privacy",
-    chip: "bg-aqua/70 text-ink",
-    span: "lg:col-span-2",
-  },
-  {
-    title: "Copy, don't rewrite",
-    description: "One click and it's on your clipboard — ready to ship.",
-    visual: CopyVisual,
-    icon: Copy,
-    iconLabel: "Copy",
-    chip: "bg-periwinkle/70 text-ink",
-    span: "lg:col-span-2",
-  },
-  {
-    title: "Calm by day, focused by night",
-    description:
-      "A quiet light theme and a deep dark one — both tuned for long reading sessions.",
-    visual: ThemeVisual,
-    icon: SunMoon,
-    iconLabel: "Themes",
-    chip: "bg-success/15 text-success",
-    span: "sm:col-span-2 lg:col-span-6",
-  },
-];
+// copy lives in site-content (shared with the SoftwareApplication JSON-LD);
+// the artwork and icons are presentation and stay here, keyed by feature id
+const visuals: Record<FeatureId, ComponentType> = {
+  editor: EditorVisual,
+  search: SearchVisual,
+  tags: TagsVisual,
+  privacy: PrivacyVisual,
+  copy: CopyVisual,
+  themes: ThemeVisual,
+};
+
+const icons: Record<
+  FeatureId,
+  ComponentType<{ className?: string; strokeWidth?: number }>
+> = {
+  editor: Code2,
+  search: Search,
+  tags: Tag,
+  privacy: Lock,
+  copy: Copy,
+  themes: SunMoon,
+};
+
+const features: Feature[] = featureContent.map((feature) => ({
+  ...feature,
+  visual: visuals[feature.id],
+  icon: icons[feature.id],
+}));
 
 function FeatureCard({
   title,
