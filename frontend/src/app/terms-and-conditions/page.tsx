@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Terms & Conditions",
   description:
     "The terms for using CodeVault — open source, MIT-licensed, and explained plainly.",
+  alternates: { canonical: "/terms-and-conditions" },
 };
 
 const sections = [

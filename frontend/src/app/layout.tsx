@@ -8,6 +8,13 @@ import {
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { SiteJsonLd } from "@/components/site/structured-data";
+import {
+  author,
+  siteDescription,
+  siteName,
+  siteTagline,
+  siteUrl,
+} from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({
@@ -36,45 +43,46 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  process.env.BETTER_AUTH_URL ??
-  "https://codevault-olive.vercel.app";
-const description =
-  "CodeVault is your centralized, syntax-aware code snippet library. Store, organize, search, and reuse the code you write — with Monaco editing, tagging, and private/public control.";
+const pageTitle = `${siteName} — ${siteTagline}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "CodeVault — Your Modern Code Snippet Library",
+    default: pageTitle,
     template: "%s · CodeVault",
   },
-  description,
-  applicationName: "CodeVault",
+  description: siteDescription,
+  applicationName: siteName,
   keywords: [
+    "code snippet manager",
     "code snippets",
-    "snippet manager",
-    "code library",
+    "snippet library",
     "developer tools",
-    "syntax highlighting",
-    "Monaco editor",
-    "Next.js",
     "code search",
-    "programming",
+    "code organizer",
+    "Monaco editor",
+    "syntax highlighting",
+    "code reuse",
+    "open source",
+    "self-hosted",
+    "Chrome extension",
+    "VS Code extension",
+    "developer productivity",
   ],
-  authors: [{ name: "Rahul Sain", url: "https://github.com/Anos714" }],
-  creator: "Rahul Sain",
+  authors: [{ name: author.name, url: author.url }],
+  creator: author.name,
   openGraph: {
     type: "website",
     url: siteUrl,
-    title: "CodeVault — Your Modern Code Snippet Library",
-    description,
-    siteName: "CodeVault",
+    title: pageTitle,
+    description: siteDescription,
+    siteName,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "CodeVault — Your Modern Code Snippet Library",
-    description,
+    title: pageTitle,
+    description: siteDescription,
     creator: "@RahulSain714",
   },
   icons: {

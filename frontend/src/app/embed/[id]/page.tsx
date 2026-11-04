@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { LANGUAGE_META } from "@/lib/languages";
@@ -6,6 +7,13 @@ import { highlightToHtml } from "@/lib/highlight";
 import { CopyCodeButton } from "@/components/dashboard/copy-code-button";
 import { auth } from "@/server/auth";
 import { getEmbedSnippet } from "@/server/queries";
+
+/** iframe payload for READMEs — useful to render, pointless to index. */
+export const metadata: Metadata = {
+  title: "Snippet embed",
+  description: "A public CodeVault snippet, rendered for embedding.",
+  robots: { index: false, follow: false },
+};
 
 /**
  * Chrome-free embed surface for READMEs and Notion. Drop
