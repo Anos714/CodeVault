@@ -4,35 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Check, Copy, FolderTree, PenLine, Rocket, Search } from "lucide-react";
 import { SectionHeading } from "@/components/site/section-heading";
+import { steps } from "@/lib/site-content";
 import { fadeUp, staggerContainer, inViewProps } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
-const steps = [
-  {
-    icon: PenLine,
-    step: "01",
-    title: "Capture",
-    description:
-      "Paste a snippet or write it fresh in the Monaco editor. Add a title, a note, and pick the language.",
-    note: "No forms to fight. The editor is already there.",
-  },
-  {
-    icon: FolderTree,
-    step: "02",
-    title: "Organize",
-    description:
-      "Tag it with #auth, #regex, or whatever fits. Mark it public to share, or keep it private.",
-    note: "Flat tags beat deep folders when you are in a hurry.",
-  },
-  {
-    icon: Rocket,
-    step: "03",
-    title: "Reuse",
-    description:
-      "Search by title, language, or tag — then copy it in one click. That utility is never lost again.",
-    note: "Or insert it straight into Chrome and VS Code.",
-  },
-];
+// step copy lives in site-content (shared with the HowTo JSON-LD); the icons
+// are presentation and stay here, ordered to match
+const stepIcons = [PenLine, FolderTree, Rocket];
 
 const mockRows = [
   {
@@ -264,8 +242,10 @@ export function HowItWorks() {
               {...inViewProps}
               className="flex flex-col"
             >
-              {steps.map(
-                ({ icon: Icon, step, title, description, note }, index) => (
+              {steps.map(({ step, title, description, note }, index) => {
+                const Icon = stepIcons[index];
+
+                return (
                   <motion.div
                     key={step}
                     variants={fadeUp}
@@ -305,8 +285,8 @@ export function HowItWorks() {
                       {note}
                     </p>
                   </motion.div>
-                ),
-              )}
+                );
+              })}
             </motion.div>
           </div>
         </div>
