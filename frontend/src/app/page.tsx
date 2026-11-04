@@ -8,10 +8,12 @@ import { Extensions } from "@/components/sections/extensions";
 import { Testimonials } from "@/components/sections/testimonials";
 import { FAQ } from "@/components/sections/faq";
 import { CTA } from "@/components/sections/cta";
+import { HomeJsonLd } from "@/components/site/structured-data";
 
 export default function Home() {
   return (
     <>
+      <HomeJsonLd />
       <Navbar />
       <main className="flex flex-col">
         <Hero />
