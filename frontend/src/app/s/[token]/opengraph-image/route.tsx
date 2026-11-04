@@ -44,8 +44,8 @@ export async function GET(
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#101418",
-          color: "#e6ebf2",
+          backgroundColor: "#0b0b0f",
+          color: "#f5f5f7",
           padding: "56px",
           fontFamily: "monospace",
         }}
@@ -63,14 +63,14 @@ export async function GET(
               width: "14px",
               height: "14px",
               borderRadius: "9999px",
-              backgroundColor: "#2FBF9B",
+              backgroundColor: "#9eccff",
             }}
           />
           <span
             style={{
               fontSize: "22px",
               letterSpacing: "0.08em",
-              color: "#8fa6bc",
+              color: "#a1a1aa",
               textTransform: "uppercase",
             }}
           >
@@ -85,14 +85,14 @@ export async function GET(
             fontWeight: 600,
             lineHeight: 1.15,
             marginBottom: "18px",
-            color: "#f4f7fa",
+            color: "#ffffff",
           }}
         >
           {snippet.title}
         </div>
 
         {snippet.description ? (
-          <div style={{ display: "flex", fontSize: "22px", color: "#8fa6bc" }}>
+          <div style={{ display: "flex", fontSize: "22px", color: "#a1a1aa" }}>
             {snippet.description}
           </div>
         ) : null}
@@ -102,8 +102,8 @@ export async function GET(
             display: "flex",
             marginTop: "36px",
             borderRadius: "14px",
-            border: "1px solid #233040",
-            backgroundColor: "#161e27",
+            border: "1px solid #26262c",
+            backgroundColor: "#131318",
             padding: "24px 28px",
             overflow: "hidden",
           }}
@@ -113,7 +113,7 @@ export async function GET(
               display: "flex",
               fontSize: "20px",
               lineHeight: 1.5,
-              color: "#c9d4e0",
+              color: "#d4d4d8",
               margin: 0,
               whiteSpace: "pre",
             }}
@@ -127,7 +127,7 @@ export async function GET(
             display: "flex",
             marginTop: "auto",
             fontSize: "18px",
-            color: "#5f7285",
+            color: "#71717a",
           }}
         >
           by {snippet.authorName}
