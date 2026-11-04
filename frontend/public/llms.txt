@@ -1,0 +1,52 @@
+# CodeVault
+
+> CodeVault is an open-source (MIT), syntax-aware code snippet library for developers. Store, organize, search, and reuse the code you write: a Monaco-powered editor, flat #tags, private-by-default snippets, full-text search, and one-click copy — in the browser, plus Chrome and VS Code extensions. Free to use, free to self-host.
+
+CodeVault is free with no paid tiers. Anyone can browse public snippets; an account (Google or GitHub sign-in) is only needed to create and manage your own.
+
+## Product
+
+- [Homepage](https://codevault-olive.vercel.app/): features, live demo, testimonials, and FAQ
+- [Sign in](https://codevault-olive.vercel.app/auth): create an account with Google or GitHub
+- [REST API](https://github.com/Anos714/CodeVault/blob/main/docs/api.md): PAT-authenticated `/api/v1` endpoints for snippets, tokens, and profile
+
+## Extensions
+
+- [Chrome extension](https://github.com/Anos714/CodeVault/tree/main/chrome-extension): save code selections from any web page into your vault
+- [VS Code extension](https://github.com/Anos714/CodeVault/tree/main/vscode-extension): insert snippets from your vault at the cursor
+
+## Features
+
+- Monaco editor: the same engine that powers VS Code — real syntax highlighting, indentation, and instant language switching
+- Search: match on title, language, description, or tags, with a ⌘K command palette
+- Tags: flat #tags instead of deep folders
+- Privacy: every snippet is private by default; one switch makes it public and shareable
+- Copy: one-click copy to clipboard, or insert straight into Chrome and VS Code
+- Themes: light and dark, both tuned for long reading sessions
+- Sharing: unlisted share links and embeddable iframes for READMEs and Notion
+
+## How it works
+
+1. Capture: paste or write a snippet in the Monaco editor with a title, a note, and a language
+2. Organize: tag it (#auth, #regex), keep it private or mark it public
+3. Reuse: search by title, language, or tag and copy in one click — or insert it in Chrome and VS Code
+
+## FAQ
+
+- Is CodeVault free? Yes — open source under the MIT license; self-host it or use the hosted version at no cost.
+- Do I need an account to browse public snippets? No. Anyone can browse public snippets; an account is only required to create and manage your own.
+- Which languages are supported? Anything you can type — popular languages highlight out of the box, and Monaco handles dozens more.
+- Can I keep snippets private? Yes — every snippet defaults to private, with one switch to share it publicly.
+- Is my data portable? Yes — copy any snippet in one click, and the source is fully open if you would rather self-host.
+
+## Source
+
+- [GitHub repository](https://github.com/Anos714/CodeVault): MIT licensed, self-hostable
+- [License](https://github.com/Anos714/CodeVault/blob/main/LICENSE)
+- [Author: Rahul Sain](https://github.com/Anos714)
+
+## Optional metadata
+
+- Site URL: https://codevault-olive.vercel.app
+- Pricing: free, MIT license, no paid tiers
+- Supported clients: web app, Chrome (MV3), VS Code
