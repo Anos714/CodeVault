@@ -122,4 +122,26 @@ describe("CodeVaultClient (VS Code)", () => {
       code: "network_error",
     });
   });
+
+  it("invokes the default fetch with the global receiver", async () => {
+    // Native fetch rejects an unbound call with "Illegal invocation" on newer
+    // V8 builds; the client must keep the global receiver.
+    const original = globalThis.fetch;
+    const receivers: unknown[] = [];
+    globalThis.fetch = function (this: unknown) {
+      receivers.push(this);
+      return Promise.resolve(jsonResponse({ user: { id: "u1" } }));
+    } as typeof fetch;
+
+    try {
+      const client = new CodeVaultClient({
+        baseUrl: "http://localhost:3000",
+        token: "t",
+      });
+      await expect(client.me()).resolves.toMatchObject({ id: "u1" });
+      expect(receivers[0]).toBe(globalThis);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
 });

@@ -148,4 +148,26 @@ describe("CodeVaultClient", () => {
         }),
     ).toThrow(/http/i);
   });
+
+  it("invokes the default fetch with the global receiver", async () => {
+    // Chromium 156 throws "Illegal invocation" when native fetch is called as
+    // a method, so the client must not store and call it unbound.
+    const original = globalThis.fetch;
+    const receivers: unknown[] = [];
+    globalThis.fetch = function (this: unknown) {
+      receivers.push(this);
+      return Promise.resolve(jsonResponse({ user: { id: "u1" } }));
+    } as typeof fetch;
+
+    try {
+      const client = new CodeVaultClient({
+        baseUrl: "http://localhost:3000",
+        token: "t",
+      });
+      await expect(client.me()).resolves.toMatchObject({ id: "u1" });
+      expect(receivers[0]).toBe(globalThis);
+    } finally {
+      globalThis.fetch = original;
+    }
+  });
 });

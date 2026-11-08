@@ -61,7 +61,9 @@ export class CodeVaultClient {
   }) {
     this.baseUrl = normalizeBaseUrl(opts.baseUrl);
     this.token = opts.token;
-    this.fetchImpl = opts.fetchImpl ?? fetch;
+    // Call through the global receiver: Chromium 156+ rejects a native fetch
+    // invoked as a method (`this.fetchImpl(...)`) with "Illegal invocation".
+    this.fetchImpl = opts.fetchImpl ?? fetch.bind(globalThis);
   }
 
   private async request<T>(path: string, opts: RequestOptions = {}): Promise<T> {

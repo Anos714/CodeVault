@@ -60,7 +60,9 @@ export class CodeVaultClient {
   }) {
     this.baseUrl = normalizeBaseUrl(opts.baseUrl);
     this.token = opts.token;
-    this.fetchImpl = opts.fetchImpl ?? fetch;
+    // Keep the global receiver for the default implementation. Native fetch
+    // rejects an unbound/method call with "Illegal invocation" on newer V8.
+    this.fetchImpl = opts.fetchImpl ?? fetch.bind(globalThis);
   }
 
   private async request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
