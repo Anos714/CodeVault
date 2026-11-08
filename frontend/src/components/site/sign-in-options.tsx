@@ -45,12 +45,18 @@ export function SignInOptions({
     setPending("demo");
     setError(null);
     try {
-      const response = await fetch("/api/auth/demo", { method: "POST" });
+      const response = await fetch("/api/auth/demo", {
+        method: "POST",
+        credentials: "same-origin",
+      });
       if (!response.ok) {
         const message = await response.text();
         throw new Error(message || "Demo sign-in failed.");
       }
-      router.refresh();
+      // The POST above sets the session cookie. Refreshing /auth would only
+      // re-render this page, so send the user to the dashboard instead; the
+      // proxy gate now sees the cookie and renders the vault.
+      router.replace("/dashboard");
     } catch (err) {
       setError(
         err instanceof Error && err.message
