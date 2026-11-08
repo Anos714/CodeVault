@@ -44,7 +44,7 @@ Then either:
 ## 3. Connect
 
 1. Run **CodeVault: Connect Account** from the Command Palette.
-2. Accept the URL (default `http://localhost:3000`).
+2. Accept the URL (default `https://codevault-olive.vercel.app`).
 3. Paste the `cv_pat_…` token. The extension verifies it with
    `GET /api/v1/me` before saving it to SecretStorage.
 
@@ -67,7 +67,7 @@ Run **CodeVault: Disconnect** to remove the token.
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `codevault.baseUrl` | `http://localhost:3000` | Base URL of your instance |
+| `codevault.baseUrl` | `https://codevault-olive.vercel.app` | Base URL of your instance |
 | `codevault.defaultVisibility` | `private` | Default for new snippets |
 
 ## Verification

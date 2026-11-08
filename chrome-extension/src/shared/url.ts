@@ -14,7 +14,9 @@ export function normalizeBaseUrl(raw: string): string {
   try {
     url = new URL(value);
   } catch {
-    throw new Error("Enter a valid URL, e.g. http://localhost:3000.");
+    throw new Error(
+      "Enter a valid URL, e.g. https://codevault-olive.vercel.app.",
+    );
   }
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new Error("CodeVault URL must start with http:// or https://.");
