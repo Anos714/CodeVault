@@ -16,6 +16,19 @@ test.describe("auth", () => {
     await expect(page.getByText("Tiny LRU cache").first()).toBeVisible();
   });
 
+  test("the demo button signs in and leaves the auth page", async ({
+    page,
+  }) => {
+    await page.goto("/auth");
+    await page
+      .getByRole("button", { name: /Continue with a demo account/i })
+      .click();
+    // regression: the button used to spin forever because the client only
+    // refreshed /auth instead of navigating to the dashboard
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 20_000 });
+    await expect(page.getByText(/Welcome back/)).toBeVisible();
+  });
+
   test("social buttons redirect to the providers", async ({ page }) => {
     // signIn.social navigates the browser itself — assert the destination
     await page.goto("/auth");
