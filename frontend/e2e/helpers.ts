@@ -39,7 +39,8 @@ export async function createSnippet(
 export async function deleteCurrentSnippet(page: Page) {
   const del = page.getByRole("button", { name: /Delete/ });
   await del.click();
-  await page.getByRole("button", { name: /Click again to confirm/ }).click();
+  // detail-view arms a two-step confirm and relabels the button
+  await page.getByRole("button", { name: /Confirm delete/ }).click();
   await page.waitForURL(/\/dashboard\/snippets([?#]|$)/, { timeout: 20_000 });
 }
 

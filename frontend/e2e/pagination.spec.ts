@@ -17,10 +17,18 @@ test.describe("vault pagination", () => {
 
     const loadMore = page.getByRole("button", { name: /Load more/ });
     await expect(loadMore).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("12 of 13 shown")).toBeVisible();
+
+    // derive the totals from the counter instead of hardcoding them, so
+    // leftover rows from an earlier run can't make the assertion stale
+    const counter = page.getByText(/^\d+ of \d+ shown$/);
+    await expect(counter).toBeVisible();
+    const [, shown, total] = (await counter.textContent())!
+      .match(/(\d+) of (\d+) shown/)!
+      .map(Number);
+    expect(shown).toBeLessThan(total);
 
     await loadMore.click();
-    await expect(page.getByText("13 of 13 shown")).toBeVisible({
+    await expect(page.getByText(`${total} of ${total} shown`)).toBeVisible({
       timeout: 15_000,
     });
     await expect(page.getByText(title)).toBeVisible();

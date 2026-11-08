@@ -15,7 +15,7 @@ test.describe("snippet lifecycle", () => {
 
     // edit the title (base-ui renders the link with role="button")
     const edited = `${title} v2`;
-    await page.getByRole("button", { name: /Edit snippet/ }).click();
+    await page.getByRole("button", { name: "Edit", exact: true }).click();
     await expect(page).toHaveURL(/\/edit/);
     await page.locator("#snippet-title").fill(edited);
     await page.getByRole("button", { name: /Save changes/ }).click();
