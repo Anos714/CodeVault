@@ -41,7 +41,7 @@ function config(): vscode.WorkspaceConfiguration {
 
 function getBaseUrl(): string {
   return normalizeBaseUrl(
-    config().get<string>(BASE_URL_KEY) ?? "http://localhost:3000",
+    config().get<string>(BASE_URL_KEY) ?? "https://codevault-olive.vercel.app",
   );
 }
 
@@ -98,7 +98,7 @@ async function refreshStatus(
 
 async function connect(context: vscode.ExtensionContext): Promise<void> {
   const currentUrl =
-    config().get<string>(BASE_URL_KEY) ?? "http://localhost:3000";
+    config().get<string>(BASE_URL_KEY) ?? "https://codevault-olive.vercel.app";
 
   const rawUrl = await vscode.window.showInputBox({
     title: "CodeVault: Connect",

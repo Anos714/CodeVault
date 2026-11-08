@@ -96,7 +96,7 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  baseUrl: "http://localhost:3000",
+  baseUrl: "https://codevault-olive.vercel.app",
   token: null,
   defaultVisibility: "private",
 };

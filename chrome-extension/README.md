@@ -8,8 +8,9 @@ A Manifest V3 extension that talks to your CodeVault account through the
 - **Search your vault** from the popup; copy a snippet or open it in the web app.
 - **Connect with a personal access token** created in CodeVault settings.
 
-Everything runs locally against `http://localhost:3000` by default, or any
-deployed CodeVault URL you configure.
+The extension defaults to the hosted app at
+`https://codevault-olive.vercel.app`; point it at `http://localhost:3000` (or
+any other deployment) from the options page.
 
 ## 1. Start CodeVault
 
@@ -40,7 +41,7 @@ bun run build             # bundles src/ → dist/
 3. **Load unpacked** → select the `chrome-extension/` folder (the one with
    `manifest.json`).
 4. Click the CodeVault icon → **⚙** (or the connect prompt).
-5. Set the URL (default `http://localhost:3000`) and paste the token.
+5. Set the URL (default `https://codevault-olive.vercel.app`) and paste the token.
 6. **Save & connect** — the extension verifies the token with `GET /api/v1/me`.
 
 ## Usage

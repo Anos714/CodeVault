@@ -4,8 +4,12 @@
   "description": "Save, search, and insert CodeVault snippets without leaving the editor.",
   "version": "0.1.0",
   "publisher": "codevault",
-  "private": true,
   "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Anos714/CodeVault.git"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -74,7 +78,7 @@
       "properties": {
         "codevault.baseUrl": {
           "type": "string",
-          "default": "http://localhost:3000",
+          "default": "https://codevault-olive.vercel.app",
           "description": "Base URL of your CodeVault instance."
         },
         "codevault.defaultVisibility": {
